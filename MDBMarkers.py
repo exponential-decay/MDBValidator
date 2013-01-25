@@ -15,10 +15,14 @@ class MDBMarkers:
 	
 	JETVER = {JET3 : "Jet 3, Access 97", JET4 : "Jet 4, Access 2000/2002", JET5 : "Jet 5, Unknown", JETX : "Jet Unknown, Unknown"}
 	
+	# Validator versions
+	VJETUNKNOWN = 0x00
+	VJET3 = 0x03
+	VJET4 = 0x04
+	
 	# Page sizes
 	JET3PAGESIZE = 2048
 	JET4PAGESIZE = 4096
-	PAGESIZEZERO = 0
 	
 	# Magic number offset and length
 	MAGIC_OFF = 0x00

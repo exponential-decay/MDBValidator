@@ -16,8 +16,9 @@ class MDBValidator:
 	dbfile = ''
 	dbpath = ''
 	dbsize = ''
-		
-	pagesize = ''	# if zero: exit()
+	
+	dbversion = '' # if zero: exit()
+	pagesize  = ''
 
 	def __init__(self, dbpath):
 		if os.path.isfile(dbpath):
@@ -46,7 +47,7 @@ class MDBValidator:
 		self.__stdout__("")
 	
 	def handleDBDefinition(self):
-		versionheader = self.dbfile.read(MDBMarkers.MDB_VERSION_HEADER_LEN)
+		versionheader = self.dbfile.read(MDBMarkers.MDB_DEFINITION_LEN)
 		self.dbfile.seek(MDBMarkers.MDB_BOF)
 		
 		self.__getMagic__(versionheader)
@@ -67,14 +68,22 @@ class MDBValidator:
 			self.__stdout__("Version: Unidentified JetDB version.")
 		else:
 			self.__stdout__("Version:   " + versiontext)
-		self.__setPageSize__(version)	
 			
-	def __setPageSize__(self, version): 	# depends on 'version' set asap
+		self.__setVersion__(version)
+		self.__setPageSize__()	
+			
+	def __setVersion__(self, version):	
 		if version == MDBMarkers.NOID:
-			self.pagesize = MDBMarkers.PAGESIZEZERO
+			self.pagesize = MDBMarkers.VJETUNKNOWN
 		elif version == MDBMarkers.JET3:
-			self.pagesize == MDBMarkers.JET3PAGESIZE
+			self.dbversion == MDBMarkers.VJET3
 		elif version >= MDBMarkers.JET4:
+			self.dbversion >= MDBMarkers.VJET4
+			
+	def __setPageSize__(self):
+		if self.dbversion == MDBMarkers.VJET3:
+			self.pagesize == MDBMarkers.JET3PAGESIZE
+		elif self.dbversion >= MDBMarkers.VJET4:
 			self.pagesize == MDBMarkers.JET4PAGESIZE
 	
 	def __fmttime__(self, msg, time):

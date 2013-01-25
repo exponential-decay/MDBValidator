@@ -13,13 +13,12 @@ from time import strftime, gmtime
 
 class MDBValidator:
 
-	dbfile = ''
-	dbpath = ''
-	dbsize = ''
+	dbfile = ''	# File pointer
+	dbpath = ''	# File path
+	dbsize = ''	# Size of database @ dbpath
 	
 	dbversion = '' # if zero: exit()
-	pagesize  = ''
-	pwdlen 	 = ''
+	pagesize  = ''	
 
 	def __init__(self, dbpath):
 		if os.path.isfile(dbpath):
@@ -54,6 +53,8 @@ class MDBValidator:
 		self.__getMagic__(versionheader)
 		self.__getJetText__(versionheader)
 		self.__getDBVersion__(versionheader)
+		
+		self.__getPWD__(versionheader)
 	
 	def __getMagic__(self, versionheader):
 		self.__stdout__("Magic:     " + hex(struct.unpack('<I', versionheader[MDBMarkers.MAGIC_OFF:MDBMarkers.MAGIC_LEN])[0]))
@@ -72,7 +73,14 @@ class MDBValidator:
 			
 		self.__setVersion__(version)
 		self.__setPageSize__()	
-		self.__setPWDLen__()
+			
+	def __getPWD__(self, versionheader):
+		if self.dbversion == MDBMarkers.VJET3:
+			pwdlen = MDBMarkers.JET3PWDLEN
+		elif self.dbversion >= MDBMarkers.VJET4:
+			pwdlen = MDBMarkers.JET4PWDLEN
+			
+		self.__stdout__("Password field: " + binascii.hexlify(versionheader[MDBMarkers.PWDOFFSET : MDBMarkers.PWDOFFSET + pwdlen]))
 			
 	def __setVersion__(self, version):	
 		if version == MDBMarkers.NOID:
@@ -87,13 +95,7 @@ class MDBValidator:
 			self.pagesize == MDBMarkers.JET3PAGESIZE
 		elif self.dbversion >= MDBMarkers.VJET4:
 			self.pagesize == MDBMarkers.JET4PAGESIZE
-	
-	def __setPWDLen__(self):
-		if self.dbversion == MDBMarkers.VJET3:
-			self.pwdlen = MDBMarkers.JET3PWDLEN
-		elif self.dbversion >= MDBMarkers.VJET4:
-			self.pwdlen = MDBMarkers.JET4PWDLEN
-	
+		
 	def __fmttime__(self, msg, time):
 		sys.stdout.write(strftime(msg + "%a, %d %b %Y %H:%M:%S +0000" + "\n", gmtime(time)))
 	

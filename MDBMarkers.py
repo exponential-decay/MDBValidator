@@ -26,10 +26,12 @@ class MDBMarkers:
 	
 	# Password offset
 	PWDOFFSET = 0x42
+	PWDDATEOFFSET = 0x72
 	
 	# Password length
 	JET3PWDLEN = 20
 	JET4PWDLEN = 40
+	PWDDATELEN = 8
 	
 	# Magic number offset and length
 	MAGIC_OFF = 0x00

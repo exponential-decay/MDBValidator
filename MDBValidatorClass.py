@@ -19,6 +19,7 @@ class MDBValidator:
 	
 	dbversion = '' # if zero: exit()
 	pagesize  = ''
+	pwdlen 	 = ''
 
 	def __init__(self, dbpath):
 		if os.path.isfile(dbpath):
@@ -71,6 +72,7 @@ class MDBValidator:
 			
 		self.__setVersion__(version)
 		self.__setPageSize__()	
+		self.__setPWDLen__()
 			
 	def __setVersion__(self, version):	
 		if version == MDBMarkers.NOID:
@@ -85,6 +87,12 @@ class MDBValidator:
 			self.pagesize == MDBMarkers.JET3PAGESIZE
 		elif self.dbversion >= MDBMarkers.VJET4:
 			self.pagesize == MDBMarkers.JET4PAGESIZE
+	
+	def __setPWDLen__(self):
+		if self.dbversion == MDBMarkers.VJET3:
+			self.pwdlen = MDBMarkers.JET3PWDLEN
+		elif self.dbversion >= MDBMarkers.VJET4:
+			self.pwdlen = MDBMarkers.JET4PWDLEN
 	
 	def __fmttime__(self, msg, time):
 		sys.stdout.write(strftime(msg + "%a, %d %b %Y %H:%M:%S +0000" + "\n", gmtime(time)))

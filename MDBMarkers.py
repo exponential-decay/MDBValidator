@@ -24,6 +24,13 @@ class MDBMarkers:
 	JET3PAGESIZE = 2048
 	JET4PAGESIZE = 4096
 	
+	# Password offset
+	PWDOFFSET = 0x42
+	
+	# Password length
+	JET3PWDLEN = 20
+	JET4PWDLEN = 40
+	
 	# Magic number offset and length
 	MAGIC_OFF = 0x00
 	MAGIC_LEN = 4

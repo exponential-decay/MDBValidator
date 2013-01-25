@@ -8,12 +8,12 @@ class MDBMarkers:
 	# Internal byte values
 	JET3 = 0x00	# Access 97
 	JET4 = 0x01	# Access 2000/2002
-	JET5 = 0x02
-	JETX = 0x03	# Access 2010
+	JET5 = 0x02 # Unknown
+	JETX = 0x03	# Unknown
 	
 	NOID = -1	# Error for an unidentified version
 	
-	JETVER = {JET3 : "Jet 3, Access 97", JET4 : "Jet 4, Access 2000/2002", JET5 : "Jet 5, Unknown", JETX : "Jet Unknown, Access 2010"}
+	JETVER = {JET3 : "Jet 3, Access 97", JET4 : "Jet 4, Access 2000/2002", JET5 : "Jet 5, Unknown", JETX : "Jet Unknown, Unknown"}
 	
 	# Page sizes
 	JET3PAGESIZE = 2048

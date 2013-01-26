@@ -10,6 +10,7 @@ import struct
 import binascii
 from MDBMarkers import MDBMarkers
 from time import strftime, gmtime
+from operator import xor
 
 class MDBValidator:
 
@@ -76,12 +77,38 @@ class MDBValidator:
 			
 	def __getPWD__(self, versionheader):
 		if self.dbversion == MDBMarkers.VJET3:
-			pwdlen = MDBMarkers.JET3PWDLEN
+			self.__stderr__("Unable to handle JET3 at present.")
 		elif self.dbversion >= MDBMarkers.VJET4:
-			pwdlen = MDBMarkers.JET4PWDLEN
+			mdbPwdField = versionheader[MDBMarkers.PWDOFFSET : MDBMarkers.PWDOFFSET + MDBMarkers.JET4PWDLEN]
+			mdb2000key = struct.unpack('<H', versionheader[MDBMarkers.PWDKEYOFFSET : MDBMarkers.PWDKEYOFFSET + MDBMarkers.PWDKEYLEN])[0]
+			mdbKey = xor(MDBMarkers.mdb2000xormask, mdb2000key)
 			
-		self.__stdout__("Password field: " + binascii.hexlify(versionheader[MDBMarkers.PWDOFFSET : MDBMarkers.PWDOFFSET + pwdlen]))
-		self.__stdout__("Password key: " + hex(struct.unpack('<H', versionheader[MDBMarkers.PWDKEYOFFSET : MDBMarkers.PWDKEYOFFSET + MDBMarkers.PWDKEYLEN])[0]))
+			# Convert password field to little endian shorts
+			i = 0
+			pwdlist = []
+			while i < len(mdbPwdField):
+				var = mdbPwdField[i:i+2]
+				pwdlist.append(struct.unpack('<H', var)[0])	# also like var[:2][::-1] syntax
+				i+=2
+
+			# XOR Password field with default password field and then further XOR w/
+			# mask which varies with each database (db creation date as short?)
+			i = 0
+			pwd = ''
+			for defaultVal in MDBMarkers.mdb2000pwd:
+				val = xor(defaultVal, pwdlist[i])
+				if val < 256:
+					pwd = pwd + chr(val)
+				else:
+					pwd = pwd + chr(xor(val, mdbKey))
+				i+=1
+			
+			self.__stdout__("")
+			
+			if binascii.hexlify(pwd[0]) == '00':
+				pwd = "Password isn't set for this database"
+				
+			self.__stdout__("Password: " + pwd)
 	
 	def __setVersion__(self, version):	
 		if version == MDBMarkers.NOID:

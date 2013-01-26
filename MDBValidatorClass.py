@@ -81,6 +81,7 @@ class MDBValidator:
 			pwdlen = MDBMarkers.JET4PWDLEN
 			
 		self.__stdout__("Password field: " + binascii.hexlify(versionheader[MDBMarkers.PWDOFFSET : MDBMarkers.PWDOFFSET + pwdlen]))
+		self.__stdout__("Password key: " + hex(struct.unpack('<H', versionheader[MDBMarkers.PWDKEYOFFSET : MDBMarkers.PWDKEYOFFSET + MDBMarkers.PWDKEYLEN])[0]))
 			
 	def __setVersion__(self, version):	
 		if version == MDBMarkers.NOID:

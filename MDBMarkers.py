@@ -24,13 +24,21 @@ class MDBMarkers:
 	JET3PAGESIZE = 2048
 	JET4PAGESIZE = 4096
 	
+	# Global passwords
+	# Already little endian : Opposite to what would be found in std hex stream
+	mdb97pwd = [0x86, 0xFB, 0xEC, 0x37, 0x5D, 0x44, 0x9C, 0xFA, 0xC6, 0x5E, 0x28, 0xE6, 0x13, 0xB6, 0x8A, 0x60, 0x54, 0x94]
+	mdb2000pwd = [0x6ABA, 0x37EC, 0xD561, 0xFA9C, 0xCFFA, 0xE628, 0x272F, 0x608A, 0x568, 0x367B, 0xE3C9, 0xB1DF, 0x654B, 0x4313, 0x3EF3, 0x33B1, 0xF008, 0x5B79, 0x24AE, 0x2A7C]
+	mdb2000xormask = mdb2000pwd[18]
+	
 	# Password offset
 	PWDOFFSET = 0x42
-	PWDKEYOFFSET = 0x66		# KEY WHICH MASKS PASSWORD MAY BE DAYS SINCE 1900
 	
 	# Password length
 	JET3PWDLEN = 20
 	JET4PWDLEN = 40
+	
+	# MDB2000 Keys
+	PWDKEYOFFSET = 0x66		# KEY WHICH MASKS PASSWORD MAY BE DAYS SINCE 1900
 	PWDKEYLEN = 2				# SHORT AS OPPOSED TO A DOUBLE AS IN SOME DOCS
 	
 	# Magic number offset and length

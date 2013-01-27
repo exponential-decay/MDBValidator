@@ -56,6 +56,8 @@ class MDBValidator:
 		self.__getDBVersion__(versionheader)
 		
 		self.__getPWD__(versionheader)
+		
+		self.__getAdditionalFields__(versionheader)
 	
 	def __getMagic__(self, versionheader):
 		self.__stdout__("Magic:     " + hex(struct.unpack('<I', versionheader[MDBMarkers.MAGIC_OFF:MDBMarkers.MAGIC_LEN])[0]))
@@ -82,7 +84,7 @@ class MDBValidator:
 			mdbPwdField = versionheader[MDBMarkers.PWDOFFSET : MDBMarkers.PWDOFFSET + MDBMarkers.JET4PWDLEN]
 			mdb2000key = struct.unpack('<H', versionheader[MDBMarkers.PWDKEYOFFSET : MDBMarkers.PWDKEYOFFSET + MDBMarkers.PWDKEYLEN])[0]
 			mdbKey = xor(MDBMarkers.mdb2000xormask, mdb2000key)
-			
+						
 			# Convert password field to little endian shorts
 			i = 0
 			pwdlist = []
@@ -106,9 +108,17 @@ class MDBValidator:
 			self.__stdout__("")
 			
 			if binascii.hexlify(pwd[0]) == '00':
-				pwd = "Password isn't set for this database"
+				pwd = "Null"
 				
 			self.__stdout__("Password: " + pwd)
+
+	def __getAdditionalFields__(self, versionheader):
+		self.__stdout__('')
+		self.__stdout__('These fields are yet to be decoded correctly:')
+		self.__stdout__('---')
+		self.__stdout__("Code page [beta]    : " + binascii.hexlify(versionheader[MDBMarkers.CODE_PAGE_OFF : MDBMarkers.CODE_PAGE_OFF + MDBMarkers.CODE_PAGE_LEN]))
+		self.__stdout__("DB key [beta]       : " + binascii.hexlify(versionheader[MDBMarkers.KEY_OFFSET : MDBMarkers.KEY_OFFSET + MDBMarkers.KEY_LEN]))
+		self.__stdout__("Creation Date [beta]: " + binascii.hexlify(versionheader[MDBMarkers.DATE_OFF : MDBMarkers.DATE_OFF + MDBMarkers.DATE_LEN])) 
 	
 	def __setVersion__(self, version):	
 		if version == MDBMarkers.NOID:

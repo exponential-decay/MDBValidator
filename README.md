@@ -1,4 +1,0 @@
-MDBValidator
-============
-
-Work in progress.

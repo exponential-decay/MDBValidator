@@ -52,3 +52,15 @@ class MDBMarkers:
 	# UNUSED Plain Text Format ID [0x04 : 0x14]:
 	# MDB format (Access 97-2003): "Standard Jet DB"
 	# ACCDB format (Access 2007-2010): "Standard ACE DB"
+	
+	# Creation date - In testing
+	DATE_OFF = 0x72
+	DATE_LEN = 0x08
+	
+	# DB Key
+	KEY_OFFSET = 0x3E
+	KEY_LEN = 0x04
+	
+	# Code page
+	CODE_PAGE_OFF = 0x3C
+	CODE_PAGE_LEN = 0x02

@@ -6,7 +6,7 @@
 
 import sys
 import argparse
-from MDBValidatorClass import MDBValidator
+from MDBDefinitionClass import MDBDefinitionValidator
 
 def parseArguments():
 	parser = argparse.ArgumentParser(description='Validate MDB files.')
@@ -22,7 +22,7 @@ def parseArguments():
 
 def main():
 	args = parseArguments()
-	db = MDBValidator(args.mdb)
+	db = MDBDefinitionValidator(args.mdb)
 	if db.dbLoaded() is True:
 		db.returnFileSystemMetadata()
 		db.handleDBDefinition()

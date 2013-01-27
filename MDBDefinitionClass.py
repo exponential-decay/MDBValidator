@@ -8,11 +8,11 @@ import os
 import sys
 import struct
 import binascii
-from MDBMarkers import MDBMarkers
+from MDBDefinitionMarkers import MDBDefinitionMarkers
 from time import strftime, gmtime
 from operator import xor
 
-class MDBValidator:
+class MDBDefinitionValidator:
 
 	dbfile = ''	# File pointer
 	dbpath = ''	# File path
@@ -48,8 +48,8 @@ class MDBValidator:
 		self.__stdout__("")
 	
 	def handleDBDefinition(self):
-		versionheader = self.dbfile.read(MDBMarkers.MDB_DEFINITION_LEN)
-		self.dbfile.seek(MDBMarkers.MDB_BOF)
+		versionheader = self.dbfile.read(MDBDefinitionMarkers.MDB_DEFINITION_LEN)
+		self.dbfile.seek(MDBDefinitionMarkers.MDB_BOF)
 		
 		self.__getMagic__(versionheader)
 		self.__getJetText__(versionheader)
@@ -60,16 +60,16 @@ class MDBValidator:
 		self.__getAdditionalFields__(versionheader)
 	
 	def __getMagic__(self, versionheader):
-		self.__stdout__("Magic:     " + hex(struct.unpack('<I', versionheader[MDBMarkers.MAGIC_OFF:MDBMarkers.MAGIC_LEN])[0]))
+		self.__stdout__("Magic:     " + hex(struct.unpack('<I', versionheader[MDBDefinitionMarkers.MAGIC_OFF:MDBDefinitionMarkers.MAGIC_LEN])[0]))
 		
 	def __getJetText__(self, versionheader):
-		self.__stdout__("Format ID: " + versionheader[MDBMarkers.FORMAT_ID_OFF : MDBMarkers.FORMAT_ID_OFF + MDBMarkers.FORMAT_ID_LEN])
+		self.__stdout__("Format ID: " + versionheader[MDBDefinitionMarkers.FORMAT_ID_OFF : MDBDefinitionMarkers.FORMAT_ID_OFF + MDBDefinitionMarkers.FORMAT_ID_LEN])
 	
 	def __getDBVersion__(self, versionheader):
-		version = versionheader[MDBMarkers.MDB_VERSION_OFFSET]
-		versiontext = MDBMarkers.JETVER.get(ord(version), MDBMarkers.NOID)
+		version = versionheader[MDBDefinitionMarkers.MDB_VERSION_OFFSET]
+		versiontext = MDBDefinitionMarkers.JETVER.get(ord(version), MDBDefinitionMarkers.NOID)
 		
-		if versiontext == MDBMarkers.NOID:
+		if versiontext == MDBDefinitionMarkers.NOID:
 			self.__stdout__("Version: Unidentified JetDB version.")
 		else:
 			self.__stdout__("Version:   " + versiontext)
@@ -78,12 +78,12 @@ class MDBValidator:
 		self.__setPageSize__()	
 			
 	def __getPWD__(self, versionheader):
-		if self.dbversion == MDBMarkers.VJET3:
+		if self.dbversion == MDBDefinitionMarkers.VJET3:
 			self.__stderr__("Unable to handle JET3 at present.")
-		elif self.dbversion >= MDBMarkers.VJET4:
-			mdbPwdField = versionheader[MDBMarkers.PWDOFFSET : MDBMarkers.PWDOFFSET + MDBMarkers.JET4PWDLEN]
-			mdb2000key = struct.unpack('<H', versionheader[MDBMarkers.PWDKEYOFFSET : MDBMarkers.PWDKEYOFFSET + MDBMarkers.PWDKEYLEN])[0]
-			mdbKey = xor(MDBMarkers.mdb2000xormask, mdb2000key)
+		elif self.dbversion >= MDBDefinitionMarkers.VJET4:
+			mdbPwdField = versionheader[MDBDefinitionMarkers.PWDOFFSET : MDBDefinitionMarkers.PWDOFFSET + MDBDefinitionMarkers.JET4PWDLEN]
+			mdb2000key = struct.unpack('<H', versionheader[MDBDefinitionMarkers.PWDKEYOFFSET : MDBDefinitionMarkers.PWDKEYOFFSET + MDBDefinitionMarkers.PWDKEYLEN])[0]
+			mdbKey = xor(MDBDefinitionMarkers.mdb2000xormask, mdb2000key)
 						
 			# Convert password field to little endian shorts
 			i = 0
@@ -97,7 +97,7 @@ class MDBValidator:
 			# mask which varies with each database (db creation date as short?)
 			i = 0
 			pwd = ''
-			for defaultVal in MDBMarkers.mdb2000pwd:
+			for defaultVal in MDBDefinitionMarkers.mdb2000pwd:
 				val = xor(defaultVal, pwdlist[i])
 				if val < 256:
 					pwd = pwd + chr(val)
@@ -116,23 +116,23 @@ class MDBValidator:
 		self.__stdout__('')
 		self.__stdout__('These fields are yet to be decoded correctly:')
 		self.__stdout__('---')
-		self.__stdout__("Code page [beta]    : " + binascii.hexlify(versionheader[MDBMarkers.CODE_PAGE_OFF : MDBMarkers.CODE_PAGE_OFF + MDBMarkers.CODE_PAGE_LEN]))
-		self.__stdout__("DB key [beta]       : " + binascii.hexlify(versionheader[MDBMarkers.KEY_OFFSET : MDBMarkers.KEY_OFFSET + MDBMarkers.KEY_LEN]))
-		self.__stdout__("Creation Date [beta]: " + binascii.hexlify(versionheader[MDBMarkers.DATE_OFF : MDBMarkers.DATE_OFF + MDBMarkers.DATE_LEN])) 
+		self.__stdout__("Code page    : " + binascii.hexlify(versionheader[MDBDefinitionMarkers.CODE_PAGE_OFF : MDBDefinitionMarkers.CODE_PAGE_OFF + MDBDefinitionMarkers.CODE_PAGE_LEN]))
+		self.__stdout__("DB key       : " + binascii.hexlify(versionheader[MDBDefinitionMarkers.KEY_OFFSET : MDBDefinitionMarkers.KEY_OFFSET + MDBDefinitionMarkers.KEY_LEN]))
+		self.__stdout__("Creation Date: " + binascii.hexlify(versionheader[MDBDefinitionMarkers.DATE_OFF : MDBDefinitionMarkers.DATE_OFF + MDBDefinitionMarkers.DATE_LEN])) 
 	
 	def __setVersion__(self, version):	
-		if version == MDBMarkers.NOID:
-			self.pagesize = MDBMarkers.VJETUNKNOWN
-		elif version == MDBMarkers.JET3:
-			self.dbversion == MDBMarkers.VJET3
-		elif version >= MDBMarkers.JET4:
-			self.dbversion >= MDBMarkers.VJET4
+		if version == MDBDefinitionMarkers.NOID:
+			self.pagesize = MDBDefinitionMarkers.VJETUNKNOWN
+		elif version == MDBDefinitionMarkers.JET3:
+			self.dbversion == MDBDefinitionMarkers.VJET3
+		elif version >= MDBDefinitionMarkers.JET4:
+			self.dbversion >= MDBDefinitionMarkers.VJET4
 			
 	def __setPageSize__(self):
-		if self.dbversion == MDBMarkers.VJET3:
-			self.pagesize == MDBMarkers.JET3PAGESIZE
-		elif self.dbversion >= MDBMarkers.VJET4:
-			self.pagesize == MDBMarkers.JET4PAGESIZE
+		if self.dbversion == MDBDefinitionMarkers.VJET3:
+			self.pagesize == MDBDefinitionMarkers.JET3PAGESIZE
+		elif self.dbversion >= MDBDefinitionMarkers.VJET4:
+			self.pagesize == MDBDefinitionMarkers.JET4PAGESIZE
 		
 	def __fmttime__(self, msg, time):
 		sys.stdout.write(strftime(msg + "%a, %d %b %Y %H:%M:%S +0000" + "\n", gmtime(time)))

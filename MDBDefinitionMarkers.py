@@ -1,4 +1,4 @@
-class MDBMarkers:
+class MDBDefinitionMarkers:
 	
 	MDB_BOF = 0x00
 	MDB_VERSION_OFFSET = 0x14

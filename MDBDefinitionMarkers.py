@@ -16,7 +16,7 @@ class MDBDefinitionMarkers:
 	JETVER = {JET3 : "Jet 3, Access 97", JET4 : "Jet 4, Access 2000/2002", JET5 : "Jet 5, Unknown", JETX : "Jet Unknown, Unknown"}
 	
 	# Validator versions
-	VJETUNKNOWN = 0x00
+	VJETUNKNOWN = -1
 	VJET3 = 0x03
 	VJET4 = 0x04
 	

@@ -78,8 +78,14 @@ class MDBDefinitionValidator:
 		self.__setPageSize__()	
 			
 	def __getPWD__(self, versionheader):
-		if self.dbversion == MDBDefinitionMarkers.VJET3:
-			self.__stderr__("Unable to handle JET3 at present.")
+		if self.dbversion == MDBDefinitionMarkers.VJET3:			
+			mdbPwdField = versionheader[MDBDefinitionMarkers.PWDOFFSET : MDBDefinitionMarkers.PWDOFFSET + MDBDefinitionMarkers.JET3PWDLEN]
+			pwd = ''
+			i = 0
+			for x in MDBDefinitionMarkers.mdb97pwd:
+				pwd = pwd + chr(xor(x, ord(mdbPwdField[i])))
+				i+=1
+			
 		elif self.dbversion >= MDBDefinitionMarkers.VJET4:
 			mdbPwdField = versionheader[MDBDefinitionMarkers.PWDOFFSET : MDBDefinitionMarkers.PWDOFFSET + MDBDefinitionMarkers.JET4PWDLEN]
 			mdb2000key = struct.unpack('<H', versionheader[MDBDefinitionMarkers.PWDKEYOFFSET : MDBDefinitionMarkers.PWDKEYOFFSET + MDBDefinitionMarkers.PWDKEYLEN])[0]
@@ -105,12 +111,12 @@ class MDBDefinitionValidator:
 					pwd = pwd + chr(xor(val, mdbKey))
 				i+=1
 			
-			self.__stdout__("")
+		self.__stdout__("")
+		
+		if binascii.hexlify(pwd[0]) == '00':
+			pwd = "Null"
 			
-			if binascii.hexlify(pwd[0]) == '00':
-				pwd = "Null"
-				
-			self.__stdout__("Password: " + pwd)
+		self.__stdout__("Password: " + pwd)
 
 	def __getAdditionalFields__(self, versionheader):
 		self.__stdout__('')
@@ -121,18 +127,19 @@ class MDBDefinitionValidator:
 		self.__stdout__("Creation Date: " + binascii.hexlify(versionheader[MDBDefinitionMarkers.DATE_OFF : MDBDefinitionMarkers.DATE_OFF + MDBDefinitionMarkers.DATE_LEN])) 
 	
 	def __setVersion__(self, version):	
-		if version == MDBDefinitionMarkers.NOID:
-			self.pagesize = MDBDefinitionMarkers.VJETUNKNOWN
-		elif version == MDBDefinitionMarkers.JET3:
-			self.dbversion == MDBDefinitionMarkers.VJET3
+		version = ord(version)
+		if version == MDBDefinitionMarkers.JET3:
+			self.dbversion = MDBDefinitionMarkers.VJET3
 		elif version >= MDBDefinitionMarkers.JET4:
 			self.dbversion >= MDBDefinitionMarkers.VJET4
+		else:
+			self.version = MDBDefinitionMarkers.VJETUNKNOWN
 			
 	def __setPageSize__(self):
 		if self.dbversion == MDBDefinitionMarkers.VJET3:
-			self.pagesize == MDBDefinitionMarkers.JET3PAGESIZE
+			self.pagesize = MDBDefinitionMarkers.JET3PAGESIZE
 		elif self.dbversion >= MDBDefinitionMarkers.VJET4:
-			self.pagesize == MDBDefinitionMarkers.JET4PAGESIZE
+			self.pagesize = MDBDefinitionMarkers.JET4PAGESIZE
 		
 	def __fmttime__(self, msg, time):
 		sys.stdout.write(strftime(msg + "%a, %d %b %Y %H:%M:%S +0000" + "\n", gmtime(time)))

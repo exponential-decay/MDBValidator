@@ -7,6 +7,11 @@ class MDBPageIndexValidator:
 
 	def handleMDBPageIndex(self, pageindexbuffer):
 		if self.ACCESS2KVERSIONSTRING in binascii.hexlify(pageindexbuffer):
-			print "do more"
+			self.__write2file__('ver.bin', pageindexbuffer)
 		if self.ACCESS97VERSIONSTRING in binascii.hexlify(pageindexbuffer):
-			print "do more"
+			self.__write2file__('ver.bin', pageindexbuffer)
+			
+	def __write2file__(self, name, pageindexbuffer):
+		f = open(name, 'w+b')
+		f.write(pageindexbuffer)
+		f.close()

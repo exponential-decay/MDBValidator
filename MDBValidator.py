@@ -66,14 +66,24 @@ class MDBValidatorClass:
 				self.updatecount(-1)
 
 			i+=1
-			
-		self.db.outputObjectData()
-		self.outputObjectData()
+		
+		# Write to stdout...
+		# self.db.outputObjectData()
+		# self.outputObjectData()
 
 	def updatecount(self, type):
 		c = MDBValidatorMarkers.DBPAGECOUNT[type]
 		c+=1
 		MDBValidatorMarkers.DBPAGECOUNT[type] = c	
+
+	def __writeAll2File__():
+		doSomething = 0
+		
+		#for each object... (put all page objects into an array?)
+			# object.__write2file__()
+			# object.__write2file__()
+			# object.__write2file__()
+			# object.__write2file__()
 
 	# Output code
 

@@ -19,7 +19,12 @@ class MDBDefinitionValidator:
 	dbsize = ''	# Size of database @ dbpath
 	
 	dbversion = '' # if zero: exit()
-	pagesize  = ''	
+	dbpagesize = ''	
+	dbpassword = ''
+	
+	t_codepage = ''
+	t_db_key = ''
+	t_creationdate = ''
 
 	def __init__(self, dbpath):
 		if os.path.isfile(dbpath):
@@ -57,7 +62,8 @@ class MDBDefinitionValidator:
 		
 		self.__getPWD__(versionheader)
 		
-		self.__getAdditionalFields__(versionheader)
+		self.__setAdditionalFields__(versionheader)
+		self.__getAdditionalFields__()
 	
 	def __getMagic__(self, versionheader):
 		self.__stdout__("Magic:     " + hex(struct.unpack('<I', versionheader[MDBDefinitionMarkers.MAGIC_OFF:MDBDefinitionMarkers.MAGIC_LEN])[0]))
@@ -118,13 +124,18 @@ class MDBDefinitionValidator:
 			
 		self.__stdout__("Password: " + pwd)
 
-	def __getAdditionalFields__(self, versionheader):
+	def __setAdditionalFields__(self, versionheader):
+		self.t_codepage = binascii.hexlify(versionheader[MDBDefinitionMarkers.CODE_PAGE_OFF : MDBDefinitionMarkers.CODE_PAGE_OFF + MDBDefinitionMarkers.CODE_PAGE_LEN])
+		self.t_dbkey = binascii.hexlify(versionheader[MDBDefinitionMarkers.KEY_OFFSET : MDBDefinitionMarkers.KEY_OFFSET + MDBDefinitionMarkers.KEY_LEN])
+		self.t_creationdate = binascii.hexlify(versionheader[MDBDefinitionMarkers.DATE_OFF : MDBDefinitionMarkers.DATE_OFF + MDBDefinitionMarkers.DATE_LEN]) 
+		
+	def __getAdditionalFields__(self):
 		self.__stdout__('')
 		self.__stdout__('These fields are yet to be decoded correctly:')
 		self.__stdout__('---')
-		self.__stdout__("Code page    : " + binascii.hexlify(versionheader[MDBDefinitionMarkers.CODE_PAGE_OFF : MDBDefinitionMarkers.CODE_PAGE_OFF + MDBDefinitionMarkers.CODE_PAGE_LEN]))
-		self.__stdout__("DB key       : " + binascii.hexlify(versionheader[MDBDefinitionMarkers.KEY_OFFSET : MDBDefinitionMarkers.KEY_OFFSET + MDBDefinitionMarkers.KEY_LEN]))
-		self.__stdout__("Creation Date: " + binascii.hexlify(versionheader[MDBDefinitionMarkers.DATE_OFF : MDBDefinitionMarkers.DATE_OFF + MDBDefinitionMarkers.DATE_LEN])) 
+		self.__stdout__("Code page    : " + self.t_codepage)
+		self.__stdout__("DB key       : " + self.t_dbkey)
+		self.__stdout__("Creation Date: " + self.t_creationdate) 
 	
 	def __setVersion__(self, version):	
 		version = ord(version)
@@ -137,9 +148,9 @@ class MDBDefinitionValidator:
 			
 	def __setPageSize__(self):
 		if self.dbversion == MDBDefinitionMarkers.VJET3:
-			self.pagesize = MDBDefinitionMarkers.JET3PAGESIZE
+			self.dbpagesize = MDBDefinitionMarkers.JET3PAGESIZE
 		elif self.dbversion >= MDBDefinitionMarkers.VJET4:
-			self.pagesize = MDBDefinitionMarkers.JET4PAGESIZE
+			self.dbpagesize = MDBDefinitionMarkers.JET4PAGESIZE
 		
 	def __fmttime__(self, msg, time):
 		sys.stdout.write(strftime(msg + "%a, %d %b %Y %H:%M:%S +0000" + "\n", gmtime(time)))

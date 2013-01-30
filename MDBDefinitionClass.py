@@ -43,19 +43,28 @@ class MDBDefinitionValidator:
 		if self.dbfile is not '':
 			return True
 
-	def handleDBDefinition(self):
-		versionheader = self.dbfile.read(MDBDefinitionMarkers.MDB_DEFINITION_LEN)
-		self.dbfile.seek(MDBDefinitionMarkers.MDB_BOF)
-		
-		self.__setMagic__(versionheader)
-		self.__setJetVersion__(versionheader)
-		self.__setDBVersion__(versionheader)
-		self.__setPageSize__()
-		self.__setPWD__(versionheader)
-		self.__setAdditionalFields__(versionheader)
-		
+	def processDBDefinition(self):
+		if self.dbLoaded:
+			self.__readFormatHeader__()
+			self.__setMagic__(self.versionheader)
+			self.__setJetVersion__(self.versionheader)
+			self.__setDBVersion__(self.versionheader)
+			self.__setPageSize__()
+			self.__setPWD__(self.versionheader)
+			self.__setAdditionalFields__(self.versionheader)
+			return True
+		else:
+			return False
+			
+	def outputObjectData(self):
 		self.__outputDBDefinitionObjectData__()
 	
+	# Processing functions
+	
+	def __readFormatHeader__(self):
+		self.versionheader = self.dbfile.read(MDBDefinitionMarkers.MDB_DEFINITION_LEN)
+		self.dbfile.seek(MDBDefinitionMarkers.MDB_BOF)
+				
 	def __setMagic__(self, versionheader):
 		self.magic = hex(struct.unpack('<I', versionheader[MDBDefinitionMarkers.MAGIC_OFF:MDBDefinitionMarkers.MAGIC_LEN])[0])
 		
@@ -113,6 +122,14 @@ class MDBDefinitionValidator:
 		self.t_codepage = binascii.hexlify(versionheader[MDBDefinitionMarkers.CODE_PAGE_OFF : MDBDefinitionMarkers.CODE_PAGE_OFF + MDBDefinitionMarkers.CODE_PAGE_LEN])
 		self.t_dbkey = binascii.hexlify(versionheader[MDBDefinitionMarkers.KEY_OFFSET : MDBDefinitionMarkers.KEY_OFFSET + MDBDefinitionMarkers.KEY_LEN])
 		self.t_creationdate = binascii.hexlify(versionheader[MDBDefinitionMarkers.DATE_OFF : MDBDefinitionMarkers.DATE_OFF + MDBDefinitionMarkers.DATE_LEN]) 
+			
+	def __setPageSize__(self):
+		if self.dbversion == MDBDefinitionMarkers.VJET3:
+			self.dbpagesize = MDBDefinitionMarkers.JET3PAGESIZE
+		elif self.dbversion >= MDBDefinitionMarkers.VJET4:
+			self.dbpagesize = MDBDefinitionMarkers.JET4PAGESIZE
+
+	# Output code
 
 	def __returnFileSystemMetadata__(self):
 		self.__stdout__("")
@@ -140,13 +157,9 @@ class MDBDefinitionValidator:
 		self.__stdout__("Code page    : " + self.t_codepage)
 		self.__stdout__("DB key       : " + self.t_dbkey)
 		self.__stdout__("Creation Date: " + self.t_creationdate) 
-			
-	def __setPageSize__(self):
-		if self.dbversion == MDBDefinitionMarkers.VJET3:
-			self.dbpagesize = MDBDefinitionMarkers.JET3PAGESIZE
-		elif self.dbversion >= MDBDefinitionMarkers.VJET4:
-			self.dbpagesize = MDBDefinitionMarkers.JET4PAGESIZE
-		
+	
+	# Utility code
+	
 	def __fmttime__(self, msg, time):
 		sys.stdout.write(strftime(msg + "%a, %d %b %Y %H:%M:%S +0000" + "\n", gmtime(time)))
 	

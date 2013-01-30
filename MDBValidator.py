@@ -23,8 +23,9 @@ def parseArguments():
 def main():
 	args = parseArguments()
 	db = MDBDefinitionValidator(args.mdb)
-	if db.dbLoaded() is True:
-		db.handleDBDefinition()
+	if db.processDBDefinition() is True:
+		db.outputObjectData()
+		sys.exit(0)
 	else:
 		sys.exit(66)	# sysexits.h - EX_NOINPUT
 		

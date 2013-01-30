@@ -27,7 +27,9 @@ class MDBValidatorClass:
 		self.db = MDBDefinitionValidator(self.mdb)
 		if self.db.processDBDefinition() is True:
 			if (self.db.dbfilesize % self.db.dbpagesize) is 0:
-				self.validsize = True
+				self.validsize = "True"
+			else:
+				self.validsize = "False"
 			self.expectedpages = self.db.dbfilesize / self.db.dbpagesize
 		else:
 			sys.exit(66)	# sysexits.h - EX_NOINPUT
@@ -69,6 +71,8 @@ class MDBValidatorClass:
 		c = MDBValidatorMarkers.DBPAGECOUNT[type]
 		c+=1
 		MDBValidatorMarkers.DBPAGECOUNT[type] = c	
+
+	# Output code
 
 	def outputObjectData(self):
 		mdbUC = MDBUtilityClass()

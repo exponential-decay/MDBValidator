@@ -23,6 +23,8 @@ class MDBDefinitionValidator:
 	versiontext = ''
 	
 	dbversion = '' # if zero: exit()
+	
+	dbfilesize = ''
 	dbpagesize = ''	
 	
 	dbpwd = ''
@@ -36,6 +38,7 @@ class MDBDefinitionValidator:
 			self.dbfile = open(dbpath, "r+b")
 			self.dbpath = dbpath
 			self.stats = os.stat(self.dbpath)
+			self.dbfilesize = os.path.getsize(self.dbpath)
 		else:
 			self.__stderr__("Database does not exist or path isn't valid: " + dbpath)
 	
@@ -137,7 +140,7 @@ class MDBDefinitionValidator:
 		self.__fmttime__("Modified: ", self.stats.st_mtime)	#modified
 		self.__fmttime__("Accessed: ", self.stats.st_atime)	#accessed
 		self.__stdout__("")
-		self.__stdout__("Filesize: " + str(os.path.getsize(self.dbpath)) + " bytes")
+		self.__stdout__("Filesize: " + str(self.dbfilesize) + " bytes")
 		self.__stdout__("")
 
 	def __outputDBDefinitionObjectData__(self):

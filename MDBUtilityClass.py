@@ -1,4 +1,5 @@
 import sys
+from time import strftime, gmtime
 
 class MDBUtilityClass:
 

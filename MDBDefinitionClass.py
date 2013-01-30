@@ -9,7 +9,6 @@ import struct
 import binascii
 from MDBDefinitionMarkers import MDBDefinitionMarkers
 from MDBUtilityClass import MDBUtilityClass
-from time import strftime, gmtime
 from operator import xor
 
 class MDBDefinitionValidator:
@@ -40,7 +39,7 @@ class MDBDefinitionValidator:
 			self.stats = os.stat(self.dbpath)
 			self.dbfilesize = os.path.getsize(self.dbpath)
 		else:
-			self.__stderr__("Database does not exist or path isn't valid: " + dbpath)
+			MDBUtilityClss.__stderr__("Database does not exist or path isn't valid: " + dbpath)
 	
 	def dbLoaded(self):
 		if self.dbfile is not '':
@@ -60,7 +59,8 @@ class MDBDefinitionValidator:
 			return False
 			
 	def outputObjectData(self):
-		self.__outputDBDefinitionObjectData__()
+		mdbutil = MDBUtilityClass()
+		self.__outputDBDefinitionObjectData__(mdbutil)
 	
 	# Processing functions
 	
@@ -134,32 +134,32 @@ class MDBDefinitionValidator:
 
 	# Output code
 
-	def __returnFileSystemMetadata__(self):
-		self.__stdout__("")
-		self.__fmttime__("Created : ", self.stats.st_ctime)	#created
-		self.__fmttime__("Modified: ", self.stats.st_mtime)	#modified
-		self.__fmttime__("Accessed: ", self.stats.st_atime)	#accessed
-		self.__stdout__("")
-		self.__stdout__("Filesize: " + str(self.dbfilesize) + " bytes")
-		self.__stdout__("")
+	def __returnFileSystemMetadata__(self, mdbutil):
+		mdbutil.__stdout__("")
+		mdbutil.__fmttime__("Created : ", self.stats.st_ctime)	#created
+		mdbutil.__fmttime__("Modified: ", self.stats.st_mtime)	#modified
+		mdbutil.__fmttime__("Accessed: ", self.stats.st_atime)	#accessed
+		mdbutil.__stdout__("")
+		mdbutil.__stdout__("Filesize: " + str(self.dbfilesize) + " bytes")
+		mdbutil.__stdout__("")
 
-	def __outputDBDefinitionObjectData__(self):
-		self.__returnFileSystemMetadata__()
+	def __outputDBDefinitionObjectData__(self, mdbutil):
+		self.__returnFileSystemMetadata__(mdbutil)
 	
-		self.__stdout__("Magic:     " + self.magic)
-		self.__stdout__("Format ID: " + self.formatid)
+		mdbutil.__stdout__("Magic:     " + self.magic)
+		mdbutil.__stdout__("Format ID: " + self.formatid)
 
-		self.__stdout__("Version:   " + self.versiontext)
+		mdbutil.__stdout__("Version:   " + self.versiontext)
 		
-		self.__stdout__("")
-		self.__stdout__("Password: " + self.dbpwd)
+		mdbutil.__stdout__("")
+		mdbutil.__stdout__("Password: " + self.dbpwd)
 	
-		self.__stdout__('')
-		self.__stdout__('These fields are yet to be decoded correctly:')
-		self.__stdout__('---')
-		self.__stdout__("Code page    : " + self.t_codepage)
-		self.__stdout__("DB key       : " + self.t_dbkey)
-		self.__stdout__("Creation Date: " + self.t_creationdate) 
+		mdbutil.__stdout__('')
+		mdbutil.__stdout__('These fields are yet to be decoded correctly:')
+		mdbutil.__stdout__('---')
+		mdbutil.__stdout__("Code page    : " + self.t_codepage)
+		mdbutil.__stdout__("DB key       : " + self.t_dbkey)
+		mdbutil.__stdout__("Creation Date: " + self.t_creationdate) 
 		
 	def __del__(self):
 		if self.dbfile is not '':

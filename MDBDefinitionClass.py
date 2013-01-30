@@ -5,10 +5,10 @@
 # http://jabakobob.net/mdb/first-page.html
 
 import os
-import sys
 import struct
 import binascii
 from MDBDefinitionMarkers import MDBDefinitionMarkers
+from MDBUtilityClass import MDBUtilityClass
 from time import strftime, gmtime
 from operator import xor
 
@@ -160,17 +160,6 @@ class MDBDefinitionValidator:
 		self.__stdout__("Code page    : " + self.t_codepage)
 		self.__stdout__("DB key       : " + self.t_dbkey)
 		self.__stdout__("Creation Date: " + self.t_creationdate) 
-	
-	# Utility code
-	
-	def __fmttime__(self, msg, time):
-		sys.stdout.write(strftime(msg + "%a, %d %b %Y %H:%M:%S +0000" + "\n", gmtime(time)))
-	
-	def __stdout__(self, msg):
-		sys.stdout.write(msg + "\n")
-	
-	def __stderr__(self, msg):
-		sys.stderr.write(msg + "\n")
 		
 	def __del__(self):
 		if self.dbfile is not '':

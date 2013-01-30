@@ -24,7 +24,6 @@ def main():
 	args = parseArguments()
 	db = MDBDefinitionValidator(args.mdb)
 	if db.dbLoaded() is True:
-		db.returnFileSystemMetadata()
 		db.handleDBDefinition()
 	else:
 		sys.exit(66)	# sysexits.h - EX_NOINPUT

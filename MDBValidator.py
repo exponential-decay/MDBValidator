@@ -43,14 +43,24 @@ class MDBValidatorClass:
 			
 			if type in MDBValidatorMarkers.DBPAGEINDEX:
 				self.updatecount(type)
+				
+				#TODO:
+				#if type == MDBValidatorMarkers.DBDEFINITION:
+				
 				if type == MDBValidatorMarkers.DBDATAPAGE:
 					mdbPI = MDBPageIndexValidator()
-					mdbPI.handleMDBPageIndex(buf)					
+					mdbPI.handleMDBPageIndex(buf)	
+				
+				#TODO:
+				#elif type == MDBValidatorMarkers.DBTABLEDEFINITION:
+				#elif type == MDBValidatorMarkers.DBINTERINDEXPAGE:
+				#elif type == MDBValidatorMarkers.DBLEAFINDEXPAGE:
+				#elif type == MDBValidatorMarkers.DBPAGEUSAGEBMP:
+				#elif type == MDBValidatorMarkers.DBPAGENOID: 
 			else:
 				self.updatecount(-1)
 
 			i+=1
-			
 			
 		self.db.outputObjectData()
 		self.outputObjectData()

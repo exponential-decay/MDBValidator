@@ -13,7 +13,7 @@ class MDBDefinitionMarkers:
 	
 	NOID = -1	# Error for an unidentified version
 	
-	JETVER = {JET3 : "Jet 3, Access 97", JET4 : "Jet 4, Access 2000/2002", JET5 : "Jet 5, Unknown", JETX : "Jet Unknown, Unknown"}
+	JETVER = {JET3 : "Jet 3, Access 97", JET4 : "Jet 4, Access 2000/2002", JET5 : "Jet 5, Unknown Access version", JETX : "Unidentified JetDB version."}
 	
 	# Validator versions
 	VJETUNKNOWN = -1

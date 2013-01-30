@@ -50,10 +50,11 @@ class MDBDefinitionValidator:
 		self.__setMagic__(versionheader)
 		self.__setJetVersion__(versionheader)
 		self.__setDBVersion__(versionheader)
+		self.__setPageSize__()
 		self.__setPWD__(versionheader)
 		self.__setAdditionalFields__(versionheader)
 		
-		self.__getDBDefinitionObjectData__()
+		self.__outputDBDefinitionObjectData__()
 	
 	def __setMagic__(self, versionheader):
 		self.magic = hex(struct.unpack('<I', versionheader[MDBDefinitionMarkers.MAGIC_OFF:MDBDefinitionMarkers.MAGIC_LEN])[0])
@@ -72,8 +73,6 @@ class MDBDefinitionValidator:
 			self.dbversion = MDBDefinitionMarkers.VJETUNKNOWN
 			
 		self.versiontext = MDBDefinitionMarkers.JETVER.get(version, MDBDefinitionMarkers.NOID)
-		
-		self.__setPageSize__()	
 		
 	def __setPWD__(self, versionheader):
 		if self.dbversion == MDBDefinitionMarkers.VJET3:			
@@ -124,16 +123,13 @@ class MDBDefinitionValidator:
 		self.__stdout__("Filesize: " + str(os.path.getsize(self.dbpath)) + " bytes")
 		self.__stdout__("")
 
-	def __getDBDefinitionObjectData__(self):
+	def __outputDBDefinitionObjectData__(self):
 		self.__returnFileSystemMetadata__()
 	
 		self.__stdout__("Magic:     " + self.magic)
 		self.__stdout__("Format ID: " + self.formatid)
 
-		if self.versiontext == MDBDefinitionMarkers.NOID:
-			self.__stdout__("Version: Unidentified JetDB version.")
-		else:
-			self.__stdout__("Version:   " + self.versiontext)
+		self.__stdout__("Version:   " + self.versiontext)
 		
 		self.__stdout__("")
 		self.__stdout__("Password: " + self.dbpwd)

@@ -20,7 +20,8 @@ class MDBDefinitionValidator:
 	
 	dbversion = '' # if zero: exit()
 	dbpagesize = ''	
-	dbpassword = ''
+	
+	dbpwd = ''
 	
 	t_codepage = ''
 	t_db_key = ''
@@ -60,7 +61,8 @@ class MDBDefinitionValidator:
 		self.__getJetText__(versionheader)
 		self.__getDBVersion__(versionheader)
 		
-		self.__getPWD__(versionheader)
+		self.__setPWD__(versionheader)
+		self.__getPWD__()
 		
 		self.__setAdditionalFields__(versionheader)
 		self.__getAdditionalFields__()
@@ -83,13 +85,12 @@ class MDBDefinitionValidator:
 		self.__setVersion__(version)
 		self.__setPageSize__()	
 			
-	def __getPWD__(self, versionheader):
+	def __setPWD__(self, versionheader):
 		if self.dbversion == MDBDefinitionMarkers.VJET3:			
 			mdbPwdField = versionheader[MDBDefinitionMarkers.PWDOFFSET : MDBDefinitionMarkers.PWDOFFSET + MDBDefinitionMarkers.JET3PWDLEN]
-			pwd = ''
 			i = 0
 			for x in MDBDefinitionMarkers.mdb97pwd:
-				pwd = pwd + chr(xor(x, ord(mdbPwdField[i])))
+				self.dbpwd = self.dbpwd + chr(xor(x, ord(mdbPwdField[i])))
 				i+=1
 			
 		elif self.dbversion >= MDBDefinitionMarkers.VJET4:
@@ -108,27 +109,25 @@ class MDBDefinitionValidator:
 			# XOR Password field with default password field and then further XOR w/
 			# mask which varies with each database (db creation date as short?)
 			i = 0
-			pwd = ''
 			for defaultVal in MDBDefinitionMarkers.mdb2000pwd:
 				val = xor(defaultVal, pwdlist[i])
 				if val < 256:
-					pwd = pwd + chr(val)
+					self.dbpwd = self.dbpwd + chr(val)
 				else:
-					pwd = pwd + chr(xor(val, mdbKey))
+					self.dbpwd = self.dbpwd + chr(xor(val, mdbKey))
 				i+=1
 			
-		self.__stdout__("")
-		
-		if binascii.hexlify(pwd[0]) == '00':
-			pwd = "Null"
-			
-		self.__stdout__("Password: " + pwd)
-
 	def __setAdditionalFields__(self, versionheader):
 		self.t_codepage = binascii.hexlify(versionheader[MDBDefinitionMarkers.CODE_PAGE_OFF : MDBDefinitionMarkers.CODE_PAGE_OFF + MDBDefinitionMarkers.CODE_PAGE_LEN])
 		self.t_dbkey = binascii.hexlify(versionheader[MDBDefinitionMarkers.KEY_OFFSET : MDBDefinitionMarkers.KEY_OFFSET + MDBDefinitionMarkers.KEY_LEN])
 		self.t_creationdate = binascii.hexlify(versionheader[MDBDefinitionMarkers.DATE_OFF : MDBDefinitionMarkers.DATE_OFF + MDBDefinitionMarkers.DATE_LEN]) 
-		
+	
+	def __getPWD__(self):
+		self.__stdout__("")
+		if binascii.hexlify(self.dbpwd[0]) == '00':
+			self.dbpwd = "Null"
+		self.__stdout__("Password: " + self.dbpwd)
+	
 	def __getAdditionalFields__(self):
 		self.__stdout__('')
 		self.__stdout__('These fields are yet to be decoded correctly:')

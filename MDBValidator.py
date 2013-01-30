@@ -32,6 +32,9 @@ class MDBValidatorClass:
 				self.validsize = "False"
 			self.expectedpages = self.db.dbfilesize / self.db.dbpagesize
 		else:
+			# TODO: Can't have this here. File handling needs to go somewhere
+			# and then be fed into the supporting classes. Need to figure out
+			# pattern for doing this.
 			sys.exit(66)	# sysexits.h - EX_NOINPUT
 			
 	def validateMDB(self):

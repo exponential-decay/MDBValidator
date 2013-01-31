@@ -80,7 +80,7 @@ class MDBDefinitionValidator:
 		if version == MDBDefinitionMarkers.JET3:
 			self.dbversion = MDBDefinitionMarkers.VJET3
 		elif version >= MDBDefinitionMarkers.JET4:
-			self.dbversion >= MDBDefinitionMarkers.VJET4
+			self.dbversion = MDBDefinitionMarkers.VJET4
 		else:
 			self.dbversion = MDBDefinitionMarkers.VJETUNKNOWN
 			

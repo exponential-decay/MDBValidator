@@ -11,6 +11,7 @@ import argparse
 import binascii
 from MDBDefinitionClass import MDBDefinitionValidator
 from MDBPageIndexClass import MDBPageIndexValidator
+from MDBTableDefinitionClass import MDBTableDefinitionValidator
 from MDBValidatorMarkers import MDBValidatorMarkers
 from MDBUtilityClass import MDBUtilityClass
 
@@ -54,10 +55,12 @@ class MDBValidatorClass:
 				
 				if type == MDBValidatorMarkers.DBDATAPAGE:
 					mdbPI = MDBPageIndexValidator()
-					mdbPI.handleMDBPageIndex(buf)	
-				
+					#mdbPI.handleMDBPageIndex(buf)	
+				elif type == MDBValidatorMarkers.DBTABLEDEFINITION:
+					mdbTDEF = MDBTableDefinitionValidator()
+					mdbTDEF.handleMDBTableDefinition(buf)
+					
 				#TODO:
-				#elif type == MDBValidatorMarkers.DBTABLEDEFINITION:
 				#elif type == MDBValidatorMarkers.DBINTERINDEXPAGE:
 				#elif type == MDBValidatorMarkers.DBLEAFINDEXPAGE:
 				#elif type == MDBValidatorMarkers.DBPAGEUSAGEBMP:

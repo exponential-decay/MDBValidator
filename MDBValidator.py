@@ -55,17 +55,13 @@ class MDBValidatorClass:
 				#if type == MDBValidatorMarkers.DBDEFINITION:
 				
 				if type == MDBValidatorMarkers.DBDATAPAGE:
-					mdbPI = MDBPageIndexValidator()
-					#mdbPI.handleMDBPageIndex(buf)	
+					mdbPI = MDBPageIndexValidator(self.db.dbversion)
+					mdbPI.handleMDBPageIndex(buf)	
 					
-				#Properties
-				#----------
-				#Design View table definitions are stored in LvProp column of MSysObjects as OLE
-				#fields. They contain default values, description, format, required ...
 				elif type == MDBValidatorMarkers.DBTABLEDEFINITION:
 				
-					if i == MDBValidatorMarkers.MSYSOBJECTSPAGE:		# want MSysObjects
-						mdbTDEF = MDBTableDefinitionValidator()
+					if i == MDBValidatorMarkers.MSYSOBJECTSPAGE:		# want MSysObjects #from design view
+						mdbTDEF = MDBTableDefinitionValidator()		# definitions table 2nd page of DB
 						mdbTDEF.handleMDBTableDefinition(buf)
 					
 				#TODO:
@@ -114,11 +110,7 @@ class MDBValidatorClass:
 		
 		mdbUC.__stdout__("---")
 		mdbUC.__stdout__("Total: " + str(count)) 
-
-
-
-
-
+		
 # main
 
 def parseArguments():

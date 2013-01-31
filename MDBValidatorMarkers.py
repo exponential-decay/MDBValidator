@@ -32,3 +32,4 @@ class MDBValidatorMarkers:
 						 DBPAGEUSAGEBMP : DBPAGEUSAGEBMP, 
 						 DBPAGENOID : DBPAGENOID }
 						 
+	MSYSOBJECTSPAGE = 0x02

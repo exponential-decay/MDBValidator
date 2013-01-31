@@ -20,7 +20,7 @@ class MDBTableDefinitionValidator:
 		self.tdef_id = binascii.hexlify(buf[self.IDOFF : self.IDOFF + self.IDLEN])		
 		tddefblock = buf[self.DEFBLOCKOFF : self.DEFBLOCKOFF + self.DEFBLOCKLEN97]
 		tdtype = binascii.hexlify(tddefblock[0xC])
-		
+
 	def __write2file__(self, name, buf):
 		f = open(name, 'w+b')
 		f.write(buf)

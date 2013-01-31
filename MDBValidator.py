@@ -45,6 +45,7 @@ class MDBValidatorClass:
 		i = 0
 		while self.db.dbfile.tell() < self.db.dbfilesize:
 			buf = self.db.dbfile.read(self.db.dbpagesize)
+			
 			type = ord(buf[0])
 			
 			if type in MDBValidatorMarkers.DBPAGEINDEX:
@@ -56,9 +57,16 @@ class MDBValidatorClass:
 				if type == MDBValidatorMarkers.DBDATAPAGE:
 					mdbPI = MDBPageIndexValidator()
 					#mdbPI.handleMDBPageIndex(buf)	
+					
+				#Properties
+				#----------
+				#Design View table definitions are stored in LvProp column of MSysObjects as OLE
+				#fields. They contain default values, description, format, required ...
 				elif type == MDBValidatorMarkers.DBTABLEDEFINITION:
-					mdbTDEF = MDBTableDefinitionValidator()
-					mdbTDEF.handleMDBTableDefinition(buf)
+				
+					if i == MDBValidatorMarkers.MSYSOBJECTSPAGE:		# want MSysObjects
+						mdbTDEF = MDBTableDefinitionValidator()
+						mdbTDEF.handleMDBTableDefinition(buf)
 					
 				#TODO:
 				#elif type == MDBValidatorMarkers.DBINTERINDEXPAGE:

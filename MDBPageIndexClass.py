@@ -92,8 +92,8 @@ class MDBPageIndexValidator:
 		self.__readMemoHeader__(row)
 
 	def __readJet4MemoRow__(self, row):
-		todo = True
-		#self.__readMemoHeader__(row)
+		#todo = True
+		self.__readMemoHeader__(row)
 		
 	def __readMemoHeader__(self, row):			# handles JET3 and JET4
 		
@@ -134,13 +134,15 @@ class MDBPageIndexValidator:
 			while namedatalen > 0:
 				namelen = struct.unpack('<H', namedata[self.ZEROOFF : self.SHORTVAL])[0]
 				name = namedata[self.SHORTVAL : self.SHORTVAL + namelen]
+				name = name.replace('\x00', '')										# for 2k databases
 				namedataoff = self.SHORTVAL + namelen
 				namedata = namedata[namedataoff : ]
 				
 				valuedatatemp = self.__getValue__(valuedata, index)
 				valuedata = valuedatatemp[1]
 				
-				print name + ": " + valuedatatemp[0]
+				if name == 'AccessVersion' or name == 'Build':
+					print name + ": " + valuedatatemp[0]
 				
 				namedatalen = len(namedata)
 				index+=1
@@ -158,13 +160,22 @@ class MDBPageIndexValidator:
 		
 		valueindex = struct.unpack('<H', valuedata[INDEXOFF : INDEXOFF + self.SHORTVAL])[0]
 		valuelen = struct.unpack('<H', valuedata[VALUELENOFF : VALUELENOFF + self.SHORTVAL])[0]
-	
-		if valuetype == MDBPageIndexMarkers.TEXT:
-			value = valuedata[VALUEOFF : VALUEOFF + valuelen]
-		elif valuetype == MDBPageIndexMarkers.LONGINT:
-			value = str(struct.unpack('<I', valuedata[VALUEOFF : VALUEOFF + valuelen])[0])
+
+		if valueindex == index:
+			if valuetype == MDBPageIndexMarkers.TEXT:
+				value = valuedata[VALUEOFF : VALUEOFF + valuelen].replace('\x00', '')
+			elif valuetype == MDBPageIndexMarkers.LONGINT:
+				value = str(struct.unpack('<I', valuedata[VALUEOFF : VALUEOFF + valuelen])[0])
+			elif valuetype == MDBPageIndexMarkers.BOOL:
+				value = str(struct.unpack('?', valuedata[VALUEOFF : VALUEOFF + valuelen])[0])				
+			else:
+				value = "Unknown type: " + str(valuetype)
+			valuedata = valuedata[VALUEOFF + valuelen : ]		# value, remaining value data pair
+		else:	
+			value = "Not set"
+			valuedata = valuedata
 			
-		return [value, valuedata[VALUEOFF + valuelen : ]]		# value, remaining value data pair
+		return [value, valuedata]		# value, remaining value data pair
 			
 	def __write2file__(self, name, buf):
 		f = open(name, 'w+b')

@@ -3,8 +3,12 @@
 import binascii
 import struct
 from MDBDefinitionMarkers import MDBDefinitionMarkers
+from MDBPageIndexMarkers import MDBPageIndexMarkers
 
 class MDBPageIndexValidator:
+
+	ZEROOFF = 0x00
+	SHORTVAL = 0x02
 
 	ACCESS2KVERSIONSTRING = "410063006300650073007300560065007200730069006f006e"
 	ACCESS97VERSIONSTRING = "41636365737356657273696f6e"
@@ -88,7 +92,8 @@ class MDBPageIndexValidator:
 		self.__readMemoHeader__(row)
 
 	def __readJet4MemoRow__(self, row):
-		self.__readMemoHeader__(row)
+		todo = True
+		#self.__readMemoHeader__(row)
 		
 	def __readMemoHeader__(self, row):			# handles JET3 and JET4
 		
@@ -100,25 +105,67 @@ class MDBPageIndexValidator:
 		BLOCKTYPEOFF = 0x08
 		BLOCKTYPELEN = 0x02
 		
+		LENGTHTYPELEN = BLOCKLENLEN + BLOCKTYPELEN		# badname
+		
 		TDVALUEBLOCK  = 0x0000		# Table Property Value Block
 		COLPROPBLOCK  = 0x0001		# Column Property Value Block
 		PROPNAMEBLOCK = 0x0080		# Property Name Block
 		
-		blocklen = struct.unpack('<I', row[BLOCKLENOFF : BLOCKLENOFF + BLOCKLENLEN])[0]
+		namelen = struct.unpack('<I', row[BLOCKLENOFF : BLOCKLENOFF + BLOCKLENLEN])[0]
 		blocktype = struct.unpack('<H', row[BLOCKTYPEOFF : BLOCKTYPEOFF + BLOCKTYPELEN])[0]
 		
-		namedata = row[BLOCKLENOFF : BLOCKLENOFF + blocklen]	# rest of block
+		NAMEOFF = BLOCKLENOFF + LENGTHTYPELEN
+		NAMELEN = namelen - LENGTHTYPELEN
 		
-		UNKNOWNOFF = BLOCKLENOFF + blocklen
+		namedata = row[NAMEOFF: NAMEOFF + NAMELEN]	# rest of block
+		
+		UNKNOWNOFF = BLOCKLENOFF + namelen
 		VALUEOFF = (UNKNOWNOFF) + UNKNOWNLEN
 		
 		unknowndata = binascii.hexlify(row[UNKNOWNOFF : UNKNOWNOFF + UNKNOWNLEN]) # for debug
 		valuedata = row[VALUEOFF : ]
 		
 		if blocktype == PROPNAMEBLOCK:		# Want interesting MS Access metadata : version, buildno
-			print "Namedata: " + binascii.hexlify(namedata)
-			print "Valuedata: " + binascii.hexlify(valuedata) 
-			print "Unknodndata: " + unknowndata
+			
+			namedatalen = len(namedata)
+			valuedatalen = len(valuedata)
+			
+			index = 0
+			while namedatalen > 0:
+				namelen = struct.unpack('<H', namedata[self.ZEROOFF : self.SHORTVAL])[0]
+				name = namedata[self.SHORTVAL : self.SHORTVAL + namelen]
+				namedataoff = self.SHORTVAL + namelen
+				namedata = namedata[namedataoff : ]
+				
+				valuedatatemp = self.__getValue__(valuedata, index)
+				valuedata = valuedatatemp[1]
+				
+				print name + ": " + valuedatatemp[0]
+				
+				namedatalen = len(namedata)
+				index+=1
+
+	def __getValue__(self, valuedata, index):
+	
+		INDEXOFF = self.SHORTVAL + self.SHORTVAL		# 2 bytes further along
+		VALUELENOFF = INDEXOFF + self.SHORTVAL
+		VALUEOFF = VALUELENOFF + self.SHORTVAL
+	
+		partlen = struct.unpack('<H', valuedata[self.ZEROOFF : self.SHORTVAL])[0]	#length of block containing one value
+		
+		unknown = binascii.hexlify(valuedata[self.SHORTVAL])
+		valuetype = ord(valuedata[self.SHORTVAL + 1 : self.SHORTVAL + 2])
+		
+		valueindex = struct.unpack('<H', valuedata[INDEXOFF : INDEXOFF + self.SHORTVAL])[0]
+		valuelen = struct.unpack('<H', valuedata[VALUELENOFF : VALUELENOFF + self.SHORTVAL])[0]
+	
+		if valuetype == MDBPageIndexMarkers.TEXT:
+			value = valuedata[VALUEOFF : VALUEOFF + valuelen]
+		elif valuetype == MDBPageIndexMarkers.LONGINT:
+			value = str(struct.unpack('<I', valuedata[VALUEOFF : VALUEOFF + valuelen])[0])
+			
+		return [value, valuedata[VALUEOFF + valuelen : ]]		# value, remaining value data pair
+			
 	def __write2file__(self, name, buf):
 		f = open(name, 'w+b')
 		f.write(buf)

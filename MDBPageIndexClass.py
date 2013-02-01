@@ -68,9 +68,11 @@ class MDBPageIndexValidator:
 				row_offsets.append(val)
 			self.row_ptr+=self.ROWSLEN
 			
-		self.__getRowData__(row_offsets, buf)
-			
-	def __getRowData__(self, row_offsets, buf):
+		self.__getMemoRowData__(row_offsets, buf)
+	
+	#http://jabakobob.net/mdb/lvprop.html
+	
+	def __getMemoRowData__(self, row_offsets, buf):
 		y = len(buf)				# rows are written from end of page, range x:y
 		for x in row_offsets:
 			row = buf[x : y]
@@ -83,11 +85,40 @@ class MDBPageIndexValidator:
 			y = x
 
 	def __readJet3MemoRow__(self, row):
-		print "jet3"
+		self.__readMemoHeader__(row)
 
 	def __readJet4MemoRow__(self, row):
-		print "jet4"
-
+		self.__readMemoHeader__(row)
+		
+	def __readMemoHeader__(self, row):			# handles JET3 and JET4
+		
+		UNKNOWNLEN = 12
+		
+		BLOCKLENOFF = 0x04
+		BLOCKLENLEN = 0x04
+		
+		BLOCKTYPEOFF = 0x08
+		BLOCKTYPELEN = 0x02
+		
+		TDVALUEBLOCK  = 0x0000		# Table Property Value Block
+		COLPROPBLOCK  = 0x0001		# Column Property Value Block
+		PROPNAMEBLOCK = 0x0080		# Property Name Block
+		
+		blocklen = struct.unpack('<I', row[BLOCKLENOFF : BLOCKLENOFF + BLOCKLENLEN])[0]
+		blocktype = struct.unpack('<H', row[BLOCKTYPEOFF : BLOCKTYPEOFF + BLOCKTYPELEN])[0]
+		
+		namedata = row[BLOCKLENOFF : BLOCKLENOFF + blocklen]	# rest of block
+		
+		UNKNOWNOFF = BLOCKLENOFF + blocklen
+		VALUEOFF = (UNKNOWNOFF) + UNKNOWNLEN
+		
+		unknowndata = binascii.hexlify(row[UNKNOWNOFF : UNKNOWNOFF + UNKNOWNLEN]) # for debug
+		valuedata = row[VALUEOFF : ]
+		
+		if blocktype == PROPNAMEBLOCK:		# Want interesting MS Access metadata : version, buildno
+			print "Namedata: " + binascii.hexlify(namedata)
+			print "Valuedata: " + binascii.hexlify(valuedata) 
+			print "Unknodndata: " + unknowndata
 	def __write2file__(self, name, buf):
 		f = open(name, 'w+b')
 		f.write(buf)

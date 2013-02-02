@@ -1,5 +1,11 @@
 # http://jabakobob.net/mdb/data-page.html
 
+# TODO: There is a lot of 'general' code in here which is good
+# but the class exists to extract version number and build number
+# from Access Databases so conversely there is a lot of specific 
+# code used to drill down to two memo fields within the page index.
+# This needs reversing as time permits. 
+
 import binascii
 import struct
 from MDBDefinitionMarkers import MDBDefinitionMarkers

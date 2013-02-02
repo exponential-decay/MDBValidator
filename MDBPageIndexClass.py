@@ -161,8 +161,4 @@ class MDBPageIndexValidator:
 			valuedata = valuedata
 			
 		return [value, valuedata]		# value, remaining value data pair
-			
-	def __write2file__(self, name, buf):
-		f = open(name, 'w+b')
-		f.write(buf)
-		f.close()
+

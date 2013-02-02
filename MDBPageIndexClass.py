@@ -6,32 +6,12 @@ from MDBDefinitionMarkers import MDBDefinitionMarkers
 from MDBPageIndexMarkers import MDBPageIndexMarkers
 
 class MDBPageIndexValidator:
-
-	ZEROOFF = 0x00
-	SHORTVAL = 0x02
-
-	ACCESS2KVERSIONSTRING = "410063006300650073007300560065007200730069006f006e"
-	ACCESS97VERSIONSTRING = "41636365737356657273696f6e"
 	
-	MEMOJET3 = '\x4B\x4B\x44\x00'
-	MEMOJET4 = '\x4D\x52\x32\x00'
+	versionno = ''
+	buildno = ''
 	
-	FREESPACE = 0x02
-	FREESPACELEN = 0x02
-
-	TDEF = 0x04
-	TDEFLEN = 0x04
-	
-	NOROWS97  = 0x08
-	NOROWS2K = 0x0C
-	
-	NOROWSLEN = 0x02	
-	ROWSLEN = 0x02
-	
-	LONGVALUEPAGE = "LVAL"
-	
-	freespace = ''
-	numberOfRows = 0
+	freespace = ''				# free space in page index
+	numberOfRows = 0			# number of rows in page index
 
 	def __init__(self, dbversion):
 		self.dbversion = dbversion
@@ -41,50 +21,48 @@ class MDBPageIndexValidator:
 		tabledef = 0
 	
 		if self.dbversion == MDBDefinitionMarkers.VJET4:
-			if self.ACCESS2KVERSIONSTRING in binascii.hexlify(buf) or self.ACCESS97VERSIONSTRING in binascii.hexlify(buf):
+			if MDBPageIndexMarkers.ACCESS2KVERSIONSTRING in binascii.hexlify(buf) or MDBPageIndexMarkers.ACCESS97VERSIONSTRING in binascii.hexlify(buf):
 				self.__write2file__('ver.bin', buf)
 				
-				self.freespace = struct.unpack('<H', buf[self.FREESPACE : self.FREESPACE + self.FREESPACELEN])
-				tabledef = buf[self.TDEF : self.TDEF + self.TDEFLEN]
-				self.numberOfRows = struct.unpack('<H', buf[self.NOROWS2K : self.NOROWS2K + self.NOROWSLEN])[0]
+				self.freespace = struct.unpack('<H', buf[MDBPageIndexMarkers.FREESPACE : MDBPageIndexMarkers.FREESPACE + MDBPageIndexMarkers.FREESPACELEN])
+				tabledef = buf[MDBPageIndexMarkers.TDEF : MDBPageIndexMarkers.TDEF + MDBPageIndexMarkers.TDEFLEN]
+				self.numberOfRows = struct.unpack('<H', buf[MDBPageIndexMarkers.NOROWS2K : MDBPageIndexMarkers.NOROWS2K + MDBPageIndexMarkers.NOROWSLEN])[0]
 			
-				self.row_ptr = self.NOROWS2K + self.NOROWSLEN
+				self.row_ptr = MDBPageIndexMarkers.NOROWS2K + MDBPageIndexMarkers.NOROWSLEN
 		
 		elif self.dbversion == MDBDefinitionMarkers.VJET3:
-			if self.ACCESS97VERSIONSTRING in binascii.hexlify(buf):
+			if MDBPageIndexMarkers.ACCESS97VERSIONSTRING in binascii.hexlify(buf):
 				self.__write2file__('ver.bin', buf)
 				
-				self.freespace = struct.unpack('<H', buf[self.FREESPACE : self.FREESPACE + self.FREESPACELEN])
-				tabledef = buf[self.TDEF : self.TDEF + self.TDEFLEN]
-				self.numberOfRows = struct.unpack('<H', buf[self.NOROWS97 : self.NOROWS97 + self.NOROWSLEN])[0]
+				self.freespace = struct.unpack('<H', buf[MDBPageIndexMarkers.FREESPACE : MDBPageIndexMarkers.FREESPACE + MDBPageIndexMarkers.FREESPACELEN])
+				tabledef = buf[MDBPageIndexMarkers.TDEF : MDBPageIndexMarkers.TDEF + MDBPageIndexMarkers.TDEFLEN]
+				self.numberOfRows = struct.unpack('<H', buf[MDBPageIndexMarkers.NOROWS97 : MDBPageIndexMarkers.NOROWS97 + MDBPageIndexMarkers.NOROWSLEN])[0]
 
-				self.row_ptr = self.NOROWS97 + self.NOROWSLEN
+				self.row_ptr = MDBPageIndexMarkers.NOROWS97 + MDBPageIndexMarkers.NOROWSLEN
 			
-		if tabledef == self.LONGVALUEPAGE:
+		if tabledef == MDBPageIndexMarkers.LONGVALUEPAGE:
 			self.handleLongValuePage(buf)
 
 	def handleLongValuePage(self, buf):
 	
 		row_offsets = []
 		for x in range(self.numberOfRows):
-			val = struct.unpack('<H', buf[self.row_ptr : self.row_ptr + self.ROWSLEN])[0]
+			val = struct.unpack('<H', buf[self.row_ptr : self.row_ptr + MDBPageIndexMarkers.ROWSLEN])[0]
 			if (val & 0x8000) == 0:		# high order bit used for flags: 0x8000: ignore
 				row_offsets.append(val)
-			self.row_ptr+=self.ROWSLEN
+			self.row_ptr+=MDBPageIndexMarkers.ROWSLEN
 			
 		self.__getMemoRowData__(row_offsets, buf)
-	
-	#http://jabakobob.net/mdb/lvprop.html
 	
 	def __getMemoRowData__(self, row_offsets, buf):
 		y = len(buf)				# rows are written from end of page, range x:y
 		for x in row_offsets:
 			row = buf[x : y]
-			if row[0:4] == self.MEMOJET3:
-				if self.ACCESS97VERSIONSTRING in binascii.hexlify(row):
+			if row[0:4] == MDBPageIndexMarkers.MEMOJET3:
+				if MDBPageIndexMarkers.ACCESS97VERSIONSTRING in binascii.hexlify(row):
 					self.__readJet3MemoRow__(row)
-			elif row[0:4] == self.MEMOJET4:
-				if self.ACCESS2KVERSIONSTRING in binascii.hexlify(row):
+			elif row[0:4] == MDBPageIndexMarkers.MEMOJET4:
+				if MDBPageIndexMarkers.ACCESS2KVERSIONSTRING in binascii.hexlify(row):
 					self.__readJet4MemoRow__(row)
 			y = x
 
@@ -92,7 +70,6 @@ class MDBPageIndexValidator:
 		self.__readMemoHeader__(row)
 
 	def __readJet4MemoRow__(self, row):
-		#todo = True
 		self.__readMemoHeader__(row)
 		
 	def __readMemoHeader__(self, row):			# handles JET3 and JET4
@@ -132,34 +109,36 @@ class MDBPageIndexValidator:
 			
 			index = 0
 			while namedatalen > 0:
-				namelen = struct.unpack('<H', namedata[self.ZEROOFF : self.SHORTVAL])[0]
-				name = namedata[self.SHORTVAL : self.SHORTVAL + namelen]
+				namelen = struct.unpack('<H', namedata[MDBPageIndexMarkers.ZEROOFF : MDBPageIndexMarkers.SHORTVAL])[0]
+				name = namedata[MDBPageIndexMarkers.SHORTVAL : MDBPageIndexMarkers.SHORTVAL + namelen]
 				name = name.replace('\x00', '')										# for 2k databases
-				namedataoff = self.SHORTVAL + namelen
+				namedataoff = MDBPageIndexMarkers.SHORTVAL + namelen
 				namedata = namedata[namedataoff : ]
 				
 				valuedatatemp = self.__getValue__(valuedata, index)
 				valuedata = valuedatatemp[1]
 				
-				if name == 'AccessVersion' or name == 'Build':
-					print name + ": " + valuedatatemp[0]
+				if name == 'AccessVersion':
+					self.versiono = valuedatatemp[0]
+				if name == 'Build':
+					self.buildno = valuedatatemp[0]
 				
 				namedatalen = len(namedata)
 				index+=1
 
 	def __getValue__(self, valuedata, index):
 	
-		INDEXOFF = self.SHORTVAL + self.SHORTVAL		# 2 bytes further along
-		VALUELENOFF = INDEXOFF + self.SHORTVAL
-		VALUEOFF = VALUELENOFF + self.SHORTVAL
+		INDEXOFF    = MDBPageIndexMarkers.SHORTVAL + MDBPageIndexMarkers.SHORTVAL		# 2 bytes further along
+		VALUELENOFF = INDEXOFF + MDBPageIndexMarkers.SHORTVAL
+		VALUEOFF    = VALUELENOFF + MDBPageIndexMarkers.SHORTVAL
 	
-		partlen = struct.unpack('<H', valuedata[self.ZEROOFF : self.SHORTVAL])[0]	#length of block containing one value
+		partlen = struct.unpack('<H', valuedata[MDBPageIndexMarkers.ZEROOFF : MDBPageIndexMarkers.SHORTVAL])[0]	#length of block containing one value
 		
-		unknown = binascii.hexlify(valuedata[self.SHORTVAL])
-		valuetype = ord(valuedata[self.SHORTVAL + 1 : self.SHORTVAL + 2])
+		unknown = binascii.hexlify(valuedata[MDBPageIndexMarkers.SHORTVAL])
+		valuetype = ord(valuedata[MDBPageIndexMarkers.SHORTVAL + 1 : MDBPageIndexMarkers.SHORTVAL + 2])
 		
-		valueindex = struct.unpack('<H', valuedata[INDEXOFF : INDEXOFF + self.SHORTVAL])[0]
-		valuelen = struct.unpack('<H', valuedata[VALUELENOFF : VALUELENOFF + self.SHORTVAL])[0]
+		valueindex = struct.unpack('<H', valuedata[INDEXOFF : INDEXOFF + MDBPageIndexMarkers.SHORTVAL])[0]
+		valuelen = struct.unpack('<H', valuedata[VALUELENOFF : VALUELENOFF + MDBPageIndexMarkers.SHORTVAL])[0]
 
 		if valueindex == index:
 			if valuetype == MDBPageIndexMarkers.TEXT:
@@ -181,4 +160,3 @@ class MDBPageIndexValidator:
 		f = open(name, 'w+b')
 		f.write(buf)
 		f.close()
-	

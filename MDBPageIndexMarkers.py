@@ -19,3 +19,28 @@ class MDBPageIndexMarkers:
 	UNKNOWN_0E      = 0x0E
 	REPID           = 0x0F	# GUID
 	NUMERIC         = 0x10	# Scaled decimal	(17 bytes)
+	
+	# Datatype sizes
+	ZEROOFF = 0x00
+	SHORTVAL = 0x02
+	
+	MEMOJET3 = '\x4B\x4B\x44\x00'		# memo id for jet3
+	MEMOJET4 = '\x4D\x52\x32\x00'		# memo id for jet4
+	
+	FREESPACE = 0x02			# free space offset
+	FREESPACELEN = 0x02		# free space length
+
+	TDEF = 0x04					# table definition offset
+	TDEFLEN = 0x04				# table definition length
+	
+	NOROWS97  = 0x08			# number of rows offset
+	NOROWS2K = 0x0C
+	
+	NOROWSLEN = 0x02			# number of rows length
+	ROWSLEN = 0x02
+	
+	LONGVALUEPAGE = "LVAL"	# ID for long value page indexes
+	
+	# Access version strings - shortcut to ID the correct page index quickly
+	ACCESS2KVERSIONSTRING = "410063006300650073007300560065007200730069006f006e"
+	ACCESS97VERSIONSTRING = "41636365737356657273696f6e"

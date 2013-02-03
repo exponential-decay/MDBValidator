@@ -28,8 +28,7 @@ class MDBPageIndexValidator:
 	
 		if self.dbversion == MDBDefinitionMarkers.VJET4:
 			if MDBPageIndexMarkers.ACCESS2KVERSIONSTRING in binascii.hexlify(buf) or MDBPageIndexMarkers.ACCESS97VERSIONSTRING in binascii.hexlify(buf):
-				self.__write2file__('ver.bin', buf)
-				
+
 				self.freespace = struct.unpack('<H', buf[MDBPageIndexMarkers.FREESPACE : MDBPageIndexMarkers.FREESPACE + MDBPageIndexMarkers.FREESPACELEN])
 				tabledef = buf[MDBPageIndexMarkers.TDEF : MDBPageIndexMarkers.TDEF + MDBPageIndexMarkers.TDEFLEN]
 				self.numberOfRows = struct.unpack('<H', buf[MDBPageIndexMarkers.NOROWS2K : MDBPageIndexMarkers.NOROWS2K + MDBPageIndexMarkers.NOROWSLEN])[0]
@@ -38,7 +37,6 @@ class MDBPageIndexValidator:
 		
 		elif self.dbversion == MDBDefinitionMarkers.VJET3:
 			if MDBPageIndexMarkers.ACCESS97VERSIONSTRING in binascii.hexlify(buf):
-				self.__write2file__('ver.bin', buf)
 				
 				self.freespace = struct.unpack('<H', buf[MDBPageIndexMarkers.FREESPACE : MDBPageIndexMarkers.FREESPACE + MDBPageIndexMarkers.FREESPACELEN])
 				tabledef = buf[MDBPageIndexMarkers.TDEF : MDBPageIndexMarkers.TDEF + MDBPageIndexMarkers.TDEFLEN]

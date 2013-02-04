@@ -1,7 +1,9 @@
 MDBValidator
 ============
 
-Work in progress.
+**TODO:** There is an awful amount of work that needs doing yet. Text output is currently disabled. I am working on
+outputting YAML. I will also have to do a bit of renaming and refactoring before it is ready for testing. Please
+do bear this in mind. 
 
 ### License
 

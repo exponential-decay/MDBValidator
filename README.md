@@ -1,9 +1,21 @@
 MDBValidator
 ============
 
-**TODO:** There is an awful amount of work that needs doing yet. Text output is currently disabled. I am working on
-outputting YAML. I will also have to do a bit of renaming and refactoring before it is ready for testing. Please
-do bear this in mind. 
+**Features**
+
+* Identifies databases with password protection and displays the password
+* Identifies the version of Access used to create the database
+* Identifies the build number of the version of Access used to create the database
+* Displays frequency and count of 'pages' and page-'types' in the DB
+
+**TODO:**
+
+* Re-enable text output
+* Output database stats as YAML
+* Seek other db 'stats' to output
+* Rename a handful of classes to be accurate to page-type
+* De-crypt the RC4 portion of the DB definition page
+* Make generic to other Jet Databases if possible
 
 ### License
 

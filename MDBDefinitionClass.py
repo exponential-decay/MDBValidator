@@ -37,7 +37,7 @@ class MDBDefinitionValidator:
 			self.dbfile = open(dbpath, "r+b")
 			self.dbfilesize = os.path.getsize(dbpath)
 		else:
-			MDBUtilityClss.__stderr__("Database does not exist or path isn't valid: " + dbpath)
+			MDBUtilityClass.__stderr__("Database does not exist or path isn't valid: " + dbpath)
 	
 	def dbLoaded(self):
 		if self.dbfile is not '':

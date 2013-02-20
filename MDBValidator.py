@@ -49,14 +49,18 @@ class MDBValidatorClass:
 				self.updatecount(type)
 				
 				if type == MDBValidatorMarkers.DBDATAPAGE:
-					mdbDP = MDBDataPageValidator(self.db.dbversion)
-					mdbDP.handleMDBDataPage(buf)	
+					self.mdbDP = MDBDataPageValidator(self.db.dbversion)
+					self.mdbDP.handleMDBDataPage(buf)	
+					
+					if self.mdbDP.versionset == True:
+						self.versionno = self.mdbDP.versionno
+						self.buildno = self.mdbDP.buildno
 					
 				elif type == MDBValidatorMarkers.DBTABLEDEFINITION:
 				
 					if i == MDBValidatorMarkers.MSYSOBJECTSPAGE:		# want MSysObjects #from design view
-						mdbTDEF = MDBTableDefinitionValidator()		# definitions table 2nd page of DB
-						mdbTDEF.handleMDBTableDefinition(buf)
+						self.mdbTDEF = MDBTableDefinitionValidator()		# definitions table 2nd page of DB
+						self.mdbTDEF.handleMDBTableDefinition(buf)
 					
 				#TODO:
 				#if type == MDBValidatorMarkers.DBDEFINITION:
@@ -108,6 +112,7 @@ class MDBValidatorClass:
 		mdbutil.__stdout__("Format ID: " + self.db.formatid)
 
 		mdbutil.__stdout__("Version:   " + self.db.versiontext)
+		mdbutil.__stdout__("Access Version / Build Number: " + self.versionno + "." + self.buildno)
 		
 		mdbutil.__stdout__("")
 		mdbutil.__stdout__("Password: " + self.db.dbpwd)

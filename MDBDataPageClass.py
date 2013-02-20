@@ -13,6 +13,7 @@ from MDBDataPageMarkers import MDBDataPageMarkers
 
 class MDBDataPageValidator:
 	
+	versionset = False
 	versionno = ''
 	buildno = ''
 	
@@ -123,7 +124,9 @@ class MDBDataPageValidator:
 				valuedata = valuedatatemp[1]
 				
 				if name == 'AccessVersion':
-					self.versiono = valuedatatemp[0]
+					self.versionset = True
+					self.versionno = valuedatatemp[0]
+					
 				if name == 'Build':
 					self.buildno = valuedatatemp[0]
 				

@@ -1,6 +1,6 @@
 # https://raw.github.com/brianb/mdbtools/master/HACKING
 
-class MDBPageIndexMarkers:
+class MDBDataPageMarkers:
 
 	# from https://raw.github.com/brianb/mdbtools/master/HACKING
 	BOOL            = 0x01	# Boolean         ( 1 bit ) 

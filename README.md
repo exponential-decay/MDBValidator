@@ -1,7 +1,21 @@
 MDBValidator
 ============
 
-Work in progress.
+**Features**
+
+* Identifies databases with password protection and displays the password
+* Identifies the version of Access used to create the database
+* Identifies the build number of the version of Access used to create the database
+* Displays frequency and count of 'pages' and page-'types' in the DB
+
+**TODO:**
+
+* Re-enable text output
+* Output database stats as YAML
+* Seek other db 'stats' to output
+* Rename a handful of classes to be accurate to page-type
+* De-crypt the RC4 portion of the DB definition page
+* Make generic to other Jet Databases if possible
 
 ### License
 

@@ -10,11 +10,12 @@ MDBValidator
 
 **TODO:**
 
-* Re-enable text output
 * Output database stats as YAML
 * Seek other db 'stats' to output
 * De-crypt the RC4 portion of the DB definition page
 * Make generic to other Jet Databases if possible
+* Increment Access DB version, 8.0 (2000) = 9.0 (2000) etc. Seek further documentation.
+* Test Access build numbers and look for matching documented values
 
 ### License
 

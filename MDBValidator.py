@@ -23,6 +23,9 @@ class MDBValidatorClass:
 	expectedpages = ''
 	validsize = ''
 	db = ''
+	
+	versionno = 'null'
+	buildno = 'null'
 
 	def __init__(self, mdb):
 		self.mdb = mdb

@@ -13,7 +13,6 @@ MDBValidator
 * Re-enable text output
 * Output database stats as YAML
 * Seek other db 'stats' to output
-* Rename a handful of classes to be accurate to page-type
 * De-crypt the RC4 portion of the DB definition page
 * Make generic to other Jet Databases if possible
 

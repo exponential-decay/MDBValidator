@@ -13,6 +13,7 @@ import binascii
 from MDBDefinitionClass import MDBDefinitionValidator
 from MDBDataPageClass import MDBDataPageValidator
 from MDBTableDefinitionClass import MDBTableDefinitionValidator
+from MDBDefinitionMarkers import MDBDefinitionMarkers
 from MDBValidatorMarkers import MDBValidatorMarkers
 from MDBUtilityClass import MDBUtilityClass
 
@@ -112,10 +113,20 @@ class MDBValidatorClass:
 		mdbutil.__stdout__("")
 
 		mdbutil.__stdout__("Magic:     " + self.db.magic)
+		mdbutil.__stdout__("")
 		mdbutil.__stdout__("Format ID: " + self.db.formatid)
+		
+		if self.db.versiontext == MDBDefinitionMarkers.JETVER[MDBDefinitionMarkers.JET3]:
+			puid = 'x-fmt/238 x-fmt/239'
+		elif self.db.versiontext == MDBDefinitionMarkers.JETVER[MDBDefinitionMarkers.JET4]:
+			puid = 'x-fmt/240, x-fmt/241'
 
 		mdbutil.__stdout__("Version:   " + self.db.versiontext)
 		mdbutil.__stdout__("Access Version / Build Number: " + self.versionno + "." + self.buildno)
+		mdbutil.__stdout__("")
+		mdbutil.__stdout__("PUID: " + puid)
+
+		#TODO: Version Number Switch, plus all by one -ish
 		
 		mdbutil.__stdout__("")
 		mdbutil.__stdout__("Password: " + self.db.dbpwd)

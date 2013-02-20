@@ -6,6 +6,7 @@
 # https://github.com/brianb/mdbtools/blob/master/HACKING
 # http://jabakobob.net/mdb/first-page.html
 
+import os
 import sys
 import argparse
 import binascii
@@ -31,7 +32,6 @@ class MDBValidatorClass:
 				self.validsize = "True"
 			else:
 				self.validsize = "False"
-			self.expectedpages = self.db.dbfilesize / self.db.dbpagesize
 		else:
 			return 1
 			
@@ -71,8 +71,8 @@ class MDBValidatorClass:
 			i+=1
 		
 		# Write to stdout...
-		# self.db.outputObjectData()
-		# self.outputObjectData()
+		#self.db.outputObjectData()
+		self.outputObjectData()
 
 	def updatecount(self, type):
 		c = MDBValidatorMarkers.DBPAGECOUNT[type]
@@ -91,21 +91,50 @@ class MDBValidatorClass:
 	# Output code
 
 	def outputObjectData(self):
-		mdbUC = MDBUtilityClass()
+		mdbutil = MDBUtilityClass()
+		
+		# File system metadata
+		stats = os.stat(self.mdb)
+		
+		mdbutil.__stdout__("")
+		mdbutil.__fmttime__("Created : ", stats.st_ctime)	#created
+		mdbutil.__fmttime__("Modified: ", stats.st_mtime)	#modified
+		mdbutil.__fmttime__("Accessed: ", stats.st_atime)	#accessed
+		mdbutil.__stdout__("")
+		mdbutil.__stdout__("Filesize: " + str(self.db.dbfilesize) + " bytes")
+		mdbutil.__stdout__("")
+
+		mdbutil.__stdout__("Magic:     " + self.db.magic)
+		mdbutil.__stdout__("Format ID: " + self.db.formatid)
+
+		mdbutil.__stdout__("Version:   " + self.db.versiontext)
+		
+		mdbutil.__stdout__("")
+		mdbutil.__stdout__("Password: " + self.db.dbpwd)
+	
+		mdbutil.__stdout__('')
+		mdbutil.__stdout__('These fields are yet to be decoded correctly:')
+		mdbutil.__stdout__('---')
+		mdbutil.__stdout__("Code page    : " + self.db.t_codepage)
+		mdbutil.__stdout__("DB key       : " + self.db.t_dbkey)
+		mdbutil.__stdout__("Creation Date: " + self.db.t_creationdate) 
+
 
 		x = MDBValidatorMarkers.DBPAGEINDEX.itervalues()
-		mdbUC.__stdout__("")
-		mdbUC.__stdout__("Page count")
-		mdbUC.__stdout__("---")
+		mdbutil.__stdout__("")
+		mdbutil.__stdout__("Page count")
+		mdbutil.__stdout__("---")
 		
 		count = 0
 		for v in x:
 			c = MDBValidatorMarkers.DBPAGECOUNT.get(v)
 			count = count + c
-			mdbUC.__stdout__(MDBValidatorMarkers.DBPAGETYPE.get(v) + ": " + str(c))
+			mdbutil.__stdout__(MDBValidatorMarkers.DBPAGETYPE.get(v) + ": " + str(c))
 		
-		mdbUC.__stdout__("---")
-		mdbUC.__stdout__("Total: " + str(count)) 
+		expectedpages = self.db.dbfilesize / self.db.dbpagesize
+		
+		mdbutil.__stdout__("---")
+		mdbutil.__stdout__("Total (count/expected): " + str(count) + " / " + str(expectedpages)) 
 		
 # main
 

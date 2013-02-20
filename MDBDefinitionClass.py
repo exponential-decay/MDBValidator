@@ -35,9 +35,7 @@ class MDBDefinitionValidator:
 	def __init__(self, dbpath):
 		if os.path.isfile(dbpath):
 			self.dbfile = open(dbpath, "r+b")
-			self.dbpath = dbpath
-			self.stats = os.stat(self.dbpath)
-			self.dbfilesize = os.path.getsize(self.dbpath)
+			self.dbfilesize = os.path.getsize(dbpath)
 		else:
 			MDBUtilityClss.__stderr__("Database does not exist or path isn't valid: " + dbpath)
 	
@@ -131,35 +129,6 @@ class MDBDefinitionValidator:
 			self.dbpagesize = MDBDefinitionMarkers.JET3PAGESIZE
 		elif self.dbversion >= MDBDefinitionMarkers.VJET4:
 			self.dbpagesize = MDBDefinitionMarkers.JET4PAGESIZE
-
-	# Output code
-
-	def __returnFileSystemMetadata__(self, mdbutil):
-		mdbutil.__stdout__("")
-		mdbutil.__fmttime__("Created : ", self.stats.st_ctime)	#created
-		mdbutil.__fmttime__("Modified: ", self.stats.st_mtime)	#modified
-		mdbutil.__fmttime__("Accessed: ", self.stats.st_atime)	#accessed
-		mdbutil.__stdout__("")
-		mdbutil.__stdout__("Filesize: " + str(self.dbfilesize) + " bytes")
-		mdbutil.__stdout__("")
-
-	def __outputDBDefinitionObjectData__(self, mdbutil):
-		self.__returnFileSystemMetadata__(mdbutil)
-	
-		mdbutil.__stdout__("Magic:     " + self.magic)
-		mdbutil.__stdout__("Format ID: " + self.formatid)
-
-		mdbutil.__stdout__("Version:   " + self.versiontext)
-		
-		mdbutil.__stdout__("")
-		mdbutil.__stdout__("Password: " + self.dbpwd)
-	
-		mdbutil.__stdout__('')
-		mdbutil.__stdout__('These fields are yet to be decoded correctly:')
-		mdbutil.__stdout__('---')
-		mdbutil.__stdout__("Code page    : " + self.t_codepage)
-		mdbutil.__stdout__("DB key       : " + self.t_dbkey)
-		mdbutil.__stdout__("Creation Date: " + self.t_creationdate) 
 		
 	def __del__(self):
 		if self.dbfile is not '':

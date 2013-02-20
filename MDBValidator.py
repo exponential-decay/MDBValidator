@@ -106,8 +106,8 @@ class MDBValidatorClass:
 		
 		mdbutil.__stdout__("")
 		mdbutil.__fmttime__("Created : ", stats.st_ctime)	#created
-		mdbutil.__fmttime__("Modified: ", stats.st_mtime)	#modified
-		mdbutil.__fmttime__("Accessed: ", stats.st_atime)	#accessed
+		mdbutil.__fmttime__("Modified: ", self.db.mtime)	#modified
+		mdbutil.__fmttime__("Accessed: ", self.db.atime)	#accessed
 		mdbutil.__stdout__("")
 		mdbutil.__stdout__("Filesize: " + str(self.db.dbfilesize) + " bytes")
 		mdbutil.__stdout__("")

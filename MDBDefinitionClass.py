@@ -7,6 +7,7 @@
 import os
 import struct
 import binascii
+import time
 from MDBDefinitionMarkers import MDBDefinitionMarkers
 from MDBUtilityClass import MDBUtilityClass
 from operator import xor
@@ -33,11 +34,24 @@ class MDBDefinitionValidator:
 	t_creationdate = ''
 
 	def __init__(self, dbpath):
-		if os.path.isfile(dbpath):
-			self.dbfile = open(dbpath, "r+b")
+		if os.path.isfile(dbpath):		
+		
+			# Before file open operations - without exception!
+			self.mtime = os.path.getmtime(dbpath)
+			self.atime = os.path.getatime(dbpath)
 			self.dbfilesize = os.path.getsize(dbpath)
+			
+			# Needs to go after time operations - without exception!
+			self.dbfile = open(dbpath, "r+b")
+			self.dbpath = dbpath
+			
 		else:
 			MDBUtilityClass.__stderr__("Database does not exist or path isn't valid: " + dbpath)
+	
+	def __del__(self):
+		if self.dbfile is not '':
+			self.dbfile.close()
+			os.utime(self.dbpath, (self.atime, self.mtime))
 	
 	def dbLoaded(self):
 		if self.dbfile is not '':
@@ -129,7 +143,3 @@ class MDBDefinitionValidator:
 			self.dbpagesize = MDBDefinitionMarkers.JET3PAGESIZE
 		elif self.dbversion >= MDBDefinitionMarkers.VJET4:
 			self.dbpagesize = MDBDefinitionMarkers.JET4PAGESIZE
-		
-	def __del__(self):
-		if self.dbfile is not '':
-			self.dbfile.close()

@@ -48,9 +48,6 @@ class MDBValidatorClass:
 			if type in MDBValidatorMarkers.DBPAGEINDEX:
 				self.updatecount(type)
 				
-				#TODO:
-				#if type == MDBValidatorMarkers.DBDEFINITION:
-				
 				if type == MDBValidatorMarkers.DBDATAPAGE:
 					mdbDP = MDBDataPageValidator(self.db.dbversion)
 					mdbDP.handleMDBDataPage(buf)	
@@ -62,10 +59,12 @@ class MDBValidatorClass:
 						mdbTDEF.handleMDBTableDefinition(buf)
 					
 				#TODO:
+				#if type == MDBValidatorMarkers.DBDEFINITION:
 				#elif type == MDBValidatorMarkers.DBINTERINDEXPAGE:
 				#elif type == MDBValidatorMarkers.DBLEAFINDEXPAGE:
 				#elif type == MDBValidatorMarkers.DBPAGEUSAGEBMP:
 				#elif type == MDBValidatorMarkers.DBPAGENOID: 
+
 			else:
 				self.updatecount(-1)
 

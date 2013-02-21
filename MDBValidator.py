@@ -98,6 +98,18 @@ class MDBValidatorClass:
 
 	# Output code
 
+	def incrementVersion(self, versionno):
+		if versionno[0:2] == '06':
+			return "7.0"
+		elif versionno[0:2] == '07':
+			return "8.0"
+		elif versionno[0:2] == '08':
+			return "9.0"
+		elif versionno[0:2] == '09':
+			return "10.0"
+		else:
+			return "0"
+
 	def outputObjectData(self):
 		mdbutil = MDBUtilityClass()
 		
@@ -122,7 +134,8 @@ class MDBValidatorClass:
 			puid = 'x-fmt/240, x-fmt/241'
 
 		mdbutil.__stdout__("Version:   " + self.db.versiontext)
-		mdbutil.__stdout__("Access Version / Build Number: " + self.versionno + "." + self.buildno)
+
+		mdbutil.__stdout__("Access Version / Build Number: " + self.versionno + "." + self.buildno + " (" + 		self.incrementVersion(self.versionno) + "." + self.buildno + ")")
 		mdbutil.__stdout__("")
 		mdbutil.__stdout__("PUID: " + puid)
 

@@ -8,6 +8,12 @@ MDBValidator
 * Identifies the build number of the version of Access used to create the database
 * Displays frequency and count of 'pages' and page-'types' in the DB
 
+**NOTES:**
+
+As best as possible I've tried to keep good notes about the process of creating this tool, up to
+its current state. I've used the Archive Team File Format wiki as my weapon of choice. Hopefully 
+some of the notes on here will help you too: http://fileformats.archiveteam.org/wiki/Access 
+
 **TODO:**
 
 * Output database stats as YAML
